@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base target="_top">
+  <title>카드키 판매 등록 - Multi-Theme Management</title>
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            theme: 'var(--theme-primary)',
+            'theme-bg': 'var(--theme-bg)',
+            'theme-card': 'var(--theme-card)',
+            'theme-border': 'var(--theme-border)',
+            'theme-text': 'var(--theme-text)',
+            'theme-muted': 'var(--theme-muted)',
+            'theme-input': 'var(--theme-input)',
+          },
+          boxShadow: {
+            'premium': 'var(--theme-shadow)',
+            'theme-glow': 'var(--theme-glow)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      /* Midnight Emerald (Default) */
+      --theme-primary: #10b981;
+      --theme-bg: #050810;
+      --theme-card: rgba(15, 23, 42, 0.7);
+      --theme-border: rgba(255, 255, 255, 0.05);
+      --theme-text: #e2e8f0;
+      --theme-muted: #94a3b8;
+      --theme-input: rgba(255, 255, 255, 0.03);
+      --theme-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      --theme-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+      --theme-reflect: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    }
+
+    [data-theme="light"] {
+      /* Luxury Alabaster */
+      --theme-primary: #135bec;
+      --theme-bg: #f8fafc;
+      --theme-card: #ffffff;
+      --theme-border: #e2e8f0;
+      --theme-text: #0f172a;
+      --theme-muted: #64748b;
+      --theme-input: #f1f5f9;
+      --theme-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --theme-glow: 0 0 20px rgba(19, 91, 236, 0.1);
+      --theme-reflect: linear-gradient(90deg, transparent, rgba(19, 91, 236, 0.05), transparent);
+    }
+
+    [data-theme="ocean"] {
+      /* Deep Oceanic */
+      --theme-primary: #6366f1;
+      --theme-bg: #0c0e27;
+      --theme-card: rgba(17, 24, 39, 0.8);
+      --theme-border: rgba(99, 102, 241, 0.2);
+      --theme-text: #f3f4f6;
+      --theme-muted: #9ca3af;
+      --theme-input: rgba(255, 255, 255, 0.05);
+      --theme-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      --theme-glow: 0 0 25px rgba(99, 102, 241, 0.4);
+      --theme-reflect: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+
+    [data-theme="royal"] {
+      /* Royal Charcoal */
+      --theme-primary: #fbbf24;
+      --theme-bg: #121212;
+      --theme-card: #1e1e1e;
+      --theme-border: #333333;
+      --theme-text: #ffffff;
+      --theme-muted: #a3a3a3;
+      --theme-input: #262626;
+      --theme-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      --theme-glow: 0 0 20px rgba(251, 191, 36, 0.2);
+      --theme-reflect: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.1), transparent);
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .glass-card {
+      background: var(--theme-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--theme-border);
+    }
+
+    .glass-input {
+      background: var(--theme-input);
+      border: 1px solid var(--theme-border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--theme-text);
+    }
+
+    .glass-input:focus {
+      background: var(--theme-input);
+      border-color: var(--theme-primary);
+      box-shadow: 0 0 15px var(--theme-glow), inset 0 0 10px rgba(255, 255, 255, 0.02);
+      outline: none;
+    }
+
+    .light-reflect {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--theme-reflect);
+    }
+
+    body {
+      transition: background-color 0.5s ease;
+      background-color: var(--theme-bg);
+    }
+
+    .qty-btn {
+      flex: 1;
+      min-width: 60px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--theme-text-muted);
+      font-size: 0.875rem;
+      font-weight: 700;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .qty-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .qty-btn.active {
+      background: var(--theme);
+      border-color: var(--theme);
+      color: white;
+      box-shadow: 0 4px 15px rgba(var(--theme-rgb), 0.4);
+    }
+
+    .qty-btn.btn-custom {
+      flex: 2;
+      background: rgba(var(--theme-rgb), 0.1);
+      border-color: rgba(var(--theme-rgb), 0.2);
+      color: var(--theme);
+    }
+  </style>
+</head>
+
+<body class="font-sans text-theme-text antialiased overflow-x-hidden" data-theme="dark">
+  <div class="min-h-screen flex flex-col">
+    <!-- Decoration Header -->
+    <header class="border-b border-theme-border bg-theme-bg/80 backdrop-blur-md sticky top-0 z-50">
+      <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
+        <div class="flex items-center gap-8">
+          <a class="flex items-center gap-2.5 no-underline" href="#">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-theme to-emerald-600 shadow-lg shadow-theme-glow">
+              <span class="material-symbols-outlined text-white text-2xl">key</span>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-theme-text uppercase">KeyGuard <span
+                class="text-theme">Enterprise</span></span>
+          </a>
+        </div>
+
+        <div class="flex items-center gap-6">
+          <!-- Theme Switcher -->
+          <div class="flex items-center gap-2 bg-theme-input p-1 rounded-xl border border-theme-border">
+            <button onclick="setTheme('dark')"
+              class="theme-btn w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-white/10"
+              title="Midnight Emerald">
+              <div class="w-4 h-4 rounded-full bg-[#10b981]"></div>
+            </button>
+            <button onclick="setTheme('light')"
+              class="theme-btn w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-black/5"
+              title="Luxury Alabaster">
+              <div class="w-4 h-4 rounded-full bg-[#135bec]"></div>
+            </button>
+            <button onclick="setTheme('ocean')"
+              class="theme-btn w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-white/10"
+              title="Deep Oceanic">
+              <div class="w-4 h-4 rounded-full bg-[#6366f1]"></div>
+            </button>
+            <button onclick="setTheme('royal')"
+              class="theme-btn w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:bg-white/10"
+              title="Royal Charcoal">
+              <div class="w-4 h-4 rounded-full bg-[#fbbf24]"></div>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-3 pl-4 border-l border-theme-border relative group">
+            <div class="text-right hidden sm:block">
+              <p id="userName" class="text-xs font-bold text-theme-text transition-colors">시스템 관리자</p>
+              <p class="text-[10px] text-theme-muted uppercase tracking-wider font-bold">Standard Access</p>
+            </div>
+            <div
+              class="h-10 w-10 rounded-full bg-theme/10 border border-theme/20 flex items-center justify-center cursor-pointer transition-all hover:border-theme/40 overflow-hidden">
+              <img id="userAvatar" src="" class="hidden w-full h-full object-cover">
+              <span id="userIcon" class="material-symbols-outlined text-theme">person</span>
+            </div>
+
+            <!-- Admin Dropdown Menu -->
+            <div
+              class="absolute right-0 top-full mt-2 w-56 bg-theme-card border border-theme-border rounded-2xl shadow-premium opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] overflow-hidden backdrop-blur-xl">
+              <div class="px-5 py-4 border-b border-theme-border bg-white/[0.02]">
+                <p class="text-[10px] font-bold text-theme uppercase tracking-widest">Administrator</p>
+              </div>
+              <a id="navDashboard" href="?page=Admin" target="_top"
+                class="flex items-center gap-3 px-5 py-4 text-xs font-bold text-theme-muted hover:text-theme-text hover:bg-white/5 transition-all no-underline">
+                <span class="material-symbols-outlined text-sm font-bold">monitoring</span>
+                대시보드
+              </a>
+              <button onclick="openInventoryModal()"
+                class="w-full flex items-center gap-3 px-5 py-4 text-xs font-bold text-theme-muted hover:text-theme-text hover:bg-white/5 transition-all outline-none border-t border-theme-border/50">
+                <span class="material-symbols-outlined text-sm font-bold">inventory_2</span>
+                재고 관리
+              </button>
+              <a id="navLogout" href="?logout=true"
+                class="flex items-center gap-3 px-5 py-4 text-xs font-bold text-rose-500 hover:bg-rose-500/5 transition-all no-underline border-t border-theme-border">
+                <span class="material-symbols-outlined text-sm font-bold">logout</span>
+                로그아웃
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 py-16 px-8 relative">
+      <!-- Decorative Blobs for Depth -->
+      <div id="blob1"
+        class="absolute top-1/4 left-1/4 w-96 h-96 bg-theme/10 rounded-full blur-[120px] pointer-events-none transition-all duration-1000">
+      </div>
+      <div id="blob2"
+        class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-theme/5 rounded-full blur-[150px] pointer-events-none transition-all duration-1000">
+      </div>
+
+      <div class="mx-auto max-w-5xl relative z-10">
+        <div class="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+          <div class="space-y-4">
+            <nav class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-theme/80">
+              <span>Admin</span>
+              <span class="w-1 h-1 rounded-full bg-theme-muted/30"></span>
+              <span>Sales</span>
+              <span class="w-1 h-1 rounded-full bg-theme-muted/30"></span>
+              <span class="text-theme-muted">Registration</span>
+            </nav>
+            <h1 class="text-4xl font-extrabold tracking-tight text-white lg:text-5xl font-display uppercase">
+              카드키 판매 등록
+            </h1>
+            <p class="max-w-xl text-lg text-theme-muted font-light leading-relaxed">
+              시스템 보안 유지를 위해 정확한 판매 정보를 입력해 주십시오.
+              <span class="text-theme/60">모든 트랜잭션은 안전하게 기록됩니다.</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Registration Form Card with Shading -->
+        <div class="glass-card relative overflow-hidden rounded-[2rem] shadow-premium">
+          <div class="light-reflect"></div>
+          <div class="border-b border-theme-border bg-white/[0.02] px-10 py-6">
+            <div class="flex items-center justify-between">
+              <h2 class="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-theme-muted">
+                <span class="h-2 w-2 rounded-full bg-theme shadow-theme-glow"></span>
+                기본 판매 정보
+              </h2>
+              <span class="text-[10px] text-theme-muted bg-theme-input px-2 py-1 rounded">SYS-AUTH-01</span>
+            </div>
+          </div>
+          <form id="salesForm" onsubmit="submitData(event)" class="p-10 lg:p-14">
+            <div class="space-y-12">
+              <!-- Horizontal Form Row: Branch & Worker -->
+              <div class="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2">
+                <div class="flex flex-col gap-3">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">지사</label>
+                  <div class="relative group">
+                    <select id="branch" onchange="updateWorkers()"
+                      class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium focus:ring-0 appearance-none">
+                      <option value="">지사 선택</option>
+                      <option value="중앙">중앙</option>
+                      <option value="강북">강북</option>
+                      <option value="서대문">서대문</option>
+                      <option value="고양">고양</option>
+                      <option value="의정부">의정부</option>
+                      <option value="남양주">남양주</option>
+                      <option value="강릉">강릉</option>
+                      <option value="원주">원주</option>
+                    </select>
+                    <span
+                      class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">사원명 (Worker
+                    selection)</label>
+                  <div class="relative group">
+                    <select id="worker"
+                      class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium focus:ring-0 appearance-none">
+                      <option value="">지사를 먼저 선택하세요</option>
+                    </select>
+                    <span
+                      class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">person_search</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Service Number Row with Icon -->
+              <div class="flex flex-col gap-3">
+                <label
+                  class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">
+                  서비스번호 (Service Number)
+                  <span
+                    class="rounded-full bg-theme/10 px-2 py-0.5 text-[10px] text-theme border border-theme/20 font-bold">REQUIRED</span>
+                </label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-5 flex items-center text-theme/50">
+                    <span class="material-symbols-outlined text-xl font-bold">fingerprint</span>
+                  </span>
+                  <input id="serviceNo"
+                    class="glass-input h-14 w-full rounded-2xl pl-14 pr-5 text-sm font-medium placeholder:text-theme-muted/50 focus:ring-0"
+                    placeholder="SVR-0000-0000" type="text" />
+                </div>
+              </div>
+
+              <!-- Key Type Row -->
+              <div class="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2">
+                <div class="flex flex-col gap-3">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">종류 1 (Type 1)</label>
+                  <div class="relative group">
+                    <select id="type1"
+                      class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium focus:ring-0 appearance-none">
+                      <option value="카드키">카드키</option>
+                      <option value="고리키">고리키</option>
+                    </select>
+                    <span
+                      class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">종류 2</label>
+                  <div class="relative group">
+                    <select id="type2"
+                      class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium focus:ring-0 appearance-none">
+                      <option value="125">125MHz</option>
+                      <option value="135">135MHz</option>
+                    </select>
+                    <span
+                      class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">expand_more</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Quantity & Price Row -->
+              <div class="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+                <div class="flex flex-col gap-4">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">판매수량
+                  </label>
+                  <div class="flex flex-wrap gap-2" id="qtyButtonGroup">
+                    <button type="button" onclick="setQty(1, event)" class="qty-btn active">1</button>
+                    <button type="button" onclick="setQty(5, event)" class="qty-btn">5</button>
+                    <button type="button" onclick="setQty(10, event)" class="qty-btn">10</button>
+                    <button type="button" onclick="setQty(20, event)" class="qty-btn">20</button>
+                    <button type="button" onclick="setQty(50, event)" class="qty-btn">50</button>
+                    <button type="button" onclick="setQty(100, event)" class="qty-btn">100</button>
+                    <button type="button" onclick="toggleCustomQty(event)" class="qty-btn btn-custom">직접입력</button>
+                  </div>
+                  <div id="customQtyContainer" class="hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div class="relative">
+                      <input id="qty" type="number" min="1" value="1" oninput="calculateTotal()"
+                        class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-bold focus:ring-theme/50"
+                        placeholder="수량을 입력하세요" />
+                      <span
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-theme-muted">EA</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">단가 (Unit
+                    Price)</label>
+                  <div class="relative">
+                    <input id="price" value="3,000" readonly
+                      class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-bold text-theme focus:ring-0 cursor-default" />
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-theme-muted">KRW /
+                      EA</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3">
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme ml-1">합계액 (Total Amount)</label>
+                  <div class="relative">
+                    <input id="total" value="3,000" readonly
+                      class="glass-input h-14 w-full rounded-2xl px-5 text-lg font-black text-white bg-theme/20 border-theme ring-2 ring-theme/20" />
+                    <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-theme">KRW</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notes Row -->
+              <div class="flex flex-col gap-3">
+                <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">비고</label>
+                <textarea id="memo"
+                  class="glass-input w-full rounded-2xl p-5 text-sm font-medium placeholder:text-theme-muted/50 focus:ring-0 min-h-[120px]"
+                  placeholder="특이사항이나 추가 요청사항을 입력하세요..."></textarea>
+              </div>
+
+              <!-- Submit Section with Shaded Button -->
+              <div
+                class="flex flex-col sm:flex-row items-center justify-between gap-8 pt-6 border-t border-theme-border">
+                <div
+                  class="flex items-center gap-3 text-xs text-theme-muted font-medium bg-theme-input px-4 py-2 rounded-full border border-theme-border">
+                  <span class="material-symbols-outlined text-base text-theme">verified_user</span>
+                  데이터는 실시간으로 재고에 반영됩니다.
+                </div>
+                <div class="flex items-center gap-6 w-full sm:w-auto">
+                  <button class="text-sm font-bold text-theme-muted hover:text-theme-text transition-colors px-4"
+                    type="reset">초기화</button>
+                  <button type="submit"
+                    class="relative flex-1 sm:flex-none inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-theme to-teal-500 px-12 py-4 text-base font-extrabold text-white shadow-theme-glow transition-all hover:scale-[1.02] hover:brightness-110 active:scale-95 overflow-hidden">
+                    <span class="material-symbols-outlined text-xl">check_circle</span>
+                    등록하기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer Meta Info -->
+        <footer
+          class="mt-20 flex flex-col items-center justify-between gap-8 border-t border-theme-border pt-10 text-[11px] font-bold uppercase tracking-[0.2em] text-theme-muted md:flex-row">
+          <p>© 2024 KeyGuard Management Infrastructure</p>
+          <div class="flex gap-10">
+            <a class="hover:text-theme transition-colors" href="#">Privacy Policy</a>
+            <a class="hover:text-theme transition-colors" href="#">Service Status</a>
+            <a class="hover:text-theme transition-colors" href="#">Admin Portal</a>
+          </div>
+        </footer>
+      </div>
+    </main>
+
+    <!-- Inventory Registration Modal -->
+    <div id="invModal" class="fixed inset-0 z-[100] hidden">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-lg rounded-[2rem] p-10 shadow-premium animate-in zoom-in duration-300">
+          <div class="flex justify-between items-center mb-8">
+            <h3 class="text-xl font-bold text-theme-text uppercase">재고 <span class="text-theme">등록</span></h3>
+            <button onclick="closeInventoryModal()" class="text-theme-muted hover:text-rose-500 transition-colors">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <form id="invForm" class="space-y-6">
+            <div>
+              <label class="block text-[10px] font-bold text-theme-muted uppercase tracking-widest mb-2">지사
+              </label>
+              <select id="invBranch" required
+                class="glass-input w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-theme/50 appearance-none">
+                <option value="">지사 선택</option>
+                <option value="중앙">중앙</option>
+                <option value="강북">강북</option>
+                <option value="서대문">서대문</option>
+                <option value="고양">고양</option>
+                <option value="의정부">의정부</option>
+                <option value="남양주">남양주</option>
+                <option value="강릉">강릉</option>
+                <option value="원주">원주</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-theme-muted uppercase tracking-widest mb-2">품목 종류 (Key
+                Type)</label>
+              <select id="invType" required
+                class="glass-input w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-theme/50 appearance-none">
+                <option value="카드키">카드키 (Card Key)</option>
+                <option value="고리키">고리키 (Ring Key)</option>
+                <option value="보조키">보조키 (Sub Key)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-theme-muted uppercase tracking-widest mb-2">입고 수량
+              </label>
+              <input type="number" id="invQty" required placeholder="0"
+                class="glass-input w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-theme/50">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-theme-muted uppercase tracking-widest mb-2">비고
+              </label>
+              <textarea id="invMemo" placeholder="특이사항 입력"
+                class="glass-input w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-theme/50 h-24 resize-none"></textarea>
+            </div>
+            <button type="submit" id="invSubmit"
+              class="w-full bg-gradient-to-r from-theme to-teal-500 text-white font-extrabold py-4 rounded-2xl shadow-theme-glow hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4 mt-4">
+              <span class="material-symbols-outlined">save</span>
+              재고 등록하기
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "<?= typeof scriptUrl !== 'undefined' ? scriptUrl : '' ?>";
+    const BASE_URL = SCRIPT_URL.startsWith("<?=") ? "" : SCRIPT_URL;
+
+    function setTheme(themeName) {
+      document.body.setAttribute('data-theme', themeName);
+      localStorage.setItem('selectedTheme', themeName);
+      console.log('Theme changed to:', themeName);
+    }
+
+    // Formatting and UI helpers
+    function formatNumber(n) {
+      return Number(n.replace(/,/g, '')).toLocaleString();
+    }
+
+    function setQty(val, event) {
+      const container = document.getElementById('customQtyContainer');
+      const input = document.getElementById('qty');
+      container.classList.add('hidden');
+      input.value = val;
+
+      // Update UI active state
+      document.querySelectorAll('.qty-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      calculateTotal();
+    }
+
+    function toggleCustomQty(event) {
+      const container = document.getElementById('customQtyContainer');
+      const input = document.getElementById('qty');
+      container.classList.toggle('hidden');
+
+      document.querySelectorAll('.qty-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (!container.classList.contains('hidden')) {
+        input.focus();
+        input.select();
+      }
+      calculateTotal();
+    }
+
+    function calculateTotal() {
+      const gQty = document.getElementById('qty').value || 0;
+      const gPrice = 3000;
+      const gTotal = gQty * gPrice;
+      document.getElementById('total').value = gTotal.toLocaleString();
+    }
+
+    // Initial setup
+    window.onload = function () {
+      const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
+      setTheme(savedTheme);
+
+      // Check current user/branch from URL/Storage
+      const urlParams = new URLSearchParams(window.location.search);
+      const userBranch = urlParams.get('branch');
+      const userRole = urlParams.get('role') || 'Admin';
+
+      // Update Navigation Links
+      const params = `&auth=true&role=${userRole}${userBranch ? '&branch=' + encodeURIComponent(userBranch) : ''}`;
+      document.getElementById('navDashboard').href = BASE_URL ? `${BASE_URL}?page=Admin${params}` : `Admin.html?page=Admin${params}`;
+      document.getElementById('navLogout').href = BASE_URL ? `${BASE_URL}?logout=true` : `Login.html?logout=true`;
+
+      if (userBranch && userBranch !== 'HQ') {
+        document.getElementById('branch').value = userBranch;
+        document.getElementById('branch').disabled = true; // Field app for specific branch
+        updateWorkers();
+      }
+
+      calculateTotal();
+    };
+
+    function updateWorkers() {
+      const branch = document.getElementById('branch').value;
+      const workerSelect = document.getElementById('worker');
+      workerSelect.innerHTML = '<option value="">로딩 중...</option>';
+
+      if (typeof google !== 'undefined') {
+        google.script.run.withSuccessHandler(workers => {
+          workerSelect.innerHTML = '<option value="">사원 선택</option>';
+          if (workers.length === 0) {
+            workerSelect.innerHTML = '<option value="">등록된 사원이 없습니다.</option>';
+          } else {
+            workers.forEach(w => {
+              let opt = document.createElement('option');
+              opt.value = w;
+              opt.innerHTML = w;
+              workerSelect.appendChild(opt);
+            });
+          }
+        }).getWorkersByBranch(branch);
+      } else {
+        // Mock
+        setTimeout(() => {
+          const mockData = {
+            '중앙': ['김중앙', '이중앙', '박중앙', '최중앙', '정중앙'],
+            '강북': ['김강북', '이강북', '박강북', '최강북', '정강북'],
+            '서대문': ['김서대문', '이서대문', '박서대문', '최서대문', '정서대문'],
+            '고양': ['김고양', '이고양', '박고양', '최고양', '정고양'],
+            '의정부': ['김의정부', '이의정부', '박의정부', '최의정부', '정의정부'],
+            '남양주': ['김남양주', '이남양주', '박남양주', '최남양주', '정남양주'],
+            '강릉': ['김강릉', '이강릉', '박강릉', '최강릉', '정강릉'],
+            '원주': ['김원주', '이원주', '박원주', '최원주', '정원주']
+          };
+          const workers = mockData[branch] || ['테스트1', '테스트2', '테스트3', '테스트4', '테스트5'];
+          workerSelect.innerHTML = '<option value="">사원 선택</option>';
+          workers.forEach(w => {
+            let opt = document.createElement('option');
+            opt.value = w;
+            opt.innerHTML = w;
+            workerSelect.appendChild(opt);
+          });
+        }, 500);
+      }
+    }
+
+    function calculateTotal() {
+      const qty = parseInt(document.getElementById('qty').value) || 0;
+      const total = qty * 3000;
+      document.getElementById('total').value = total.toLocaleString();
+    }
+
+    function submitData(e) {
+      if (e) e.preventDefault();
+      const btn = document.querySelector('#salesForm button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '처리 중...';
+
+      const data = {
+        branch: document.getElementById('branch').value,
+        worker: document.getElementById('worker').value,
+        serviceNo: document.getElementById('serviceNo').value,
+        type1: document.getElementById('type1').value,
+        type2: document.getElementById('type2').value,
+        qty: document.getElementById('qty').value,
+        memo: document.getElementById('memo').value
+      };
+
+      if (!data.serviceNo) {
+        alert("서비스번호를 입력해주세요.");
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        return;
+      }
+
+      // 구글 앱스 스크립트 환경 대응
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(msg => {
+            alert(msg);
+            document.getElementById('salesForm').reset();
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+          })
+          .withFailureHandler(err => {
+            alert("오류가 발생했습니다: " + err.message);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+          })
+          .processForm(data);
+      } else {
+        console.log("Local Preview Data:", data);
+        alert("등록 완료되었습니다. (로컬 미리보기)");
+        document.getElementById('salesForm').reset();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+
+    // Inventory Modal Logic
+    function openInventoryModal() {
+      document.getElementById('invModal').classList.remove('hidden');
+    }
+
+    function closeInventoryModal() {
+      document.getElementById('invModal').classList.add('hidden');
+    }
+
+    document.getElementById('invForm').onsubmit = function (e) {
+      e.preventDefault();
+      const btn = document.getElementById('invSubmit');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> 등록 중...';
+
+      const payload = {
+        branch: document.getElementById('invBranch').value,
+        type: document.getElementById('invType').value,
+        qty: document.getElementById('invQty').value,
+        memo: document.getElementById('invMemo').value,
+        worker: document.getElementById('userName').innerText // Current user
+      };
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(msg => {
+          alert(msg);
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          document.getElementById('invForm').reset();
+          closeInventoryModal();
+        }).processInventory(payload);
+      } else {
+        setTimeout(() => {
+          alert("재고 등록 시뮬레이션 완료 (로컬)");
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+          closeInventoryModal();
+        }, 1000);
+      }
+    };
+  </script>
+</body>
+
+</html>

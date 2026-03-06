@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>카드키 판매 등록 - Deep Blue</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans KR", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex min-h-screen flex-col">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-800 dark:bg-background-dark/80">
+<div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
+<div class="flex items-center gap-10">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined">key</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Deep Blue</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-semibold text-primary" href="#">판매 현황</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400" href="#">재고 관리</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400" href="#">지사 정보</a>
+<a class="text-sm font-medium text-slate-600 hover:text-primary dark:text-slate-400" href="#">설정</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+<span class="material-symbols-outlined text-xl">search</span>
+</span>
+<input class="h-10 w-64 rounded-lg border-slate-200 bg-slate-100 pl-10 text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800" placeholder="검색어를 입력하세요..." type="text"/>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="h-10 w-10 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700">
+<img alt="사용자 프로필" data-alt="Professional male corporate profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZMDK-cdooTIRIvFXGsPfgBB35ql1o39t_wqyU00u6RJoF9Uc5jBN8_TGEZ3rBVna-1nUTNH1YpiIAvQKAi1k8uyPuD2ma1DASre7VuoSF6N_19OR07RFN6TA67poGELbJgZ2jmVypvd3pHpwJsQ328vadS8pyTbGUALIgfYng9re31coPTlVD4ccvn5-TsNUqs14-raacK5YOkgG--EQiKV4CskctMdCmwUDP7e5qOrpOE-WSsYedADH2ukBtMYMajpX5oFvZtVcW"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 py-12">
+<div class="mx-auto max-w-5xl px-6 lg:px-8">
+<!-- Header Section -->
+<div class="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+<div>
+<nav class="mb-4 flex items-center gap-2 text-sm font-medium text-slate-500">
+<a class="hover:text-primary" href="#">대시보드</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary" href="#">판매 관리</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-slate-900 dark:text-white font-semibold">카드키 판매 등록</span>
+</nav>
+<h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">카드키 판매 등록</h1>
+<p class="mt-2 text-base text-slate-600 dark:text-slate-400">기업용 카드키 판매 정보를 시스템에 등록하고 재고를 업데이트합니다.</p>
+</div>
+<div class="flex gap-3">
+<button class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-lg">list</span>
+                        목록으로 돌아가기
+                    </button>
+</div>
+</div>
+<!-- Registration Form Card -->
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 dark:border-slate-800 dark:bg-background-dark dark:shadow-none">
+<div class="border-b border-slate-100 bg-slate-50/50 px-8 py-4 dark:border-slate-800 dark:bg-slate-900/50">
+<h2 class="text-sm font-bold uppercase tracking-wider text-slate-500">기본 판매 정보</h2>
+</div>
+<form class="p-8 lg:p-12">
+<div class="space-y-8">
+<!-- Horizontal Form Row: Branch & Worker -->
+<div class="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">지사 (Branch)</label>
+<select class="h-12 w-full rounded-lg border-slate-200 bg-white text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800">
+<option value="">지사를 선택하세요</option>
+<option value="seoul">서울 본사</option>
+<option value="busan">부산 지사</option>
+<option value="daegu">대구 지사</option>
+<option value="gwangju">광주 지사</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">사원명 (Worker Name)</label>
+<input class="h-12 w-full rounded-lg border-slate-200 bg-white text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800" placeholder="담당 사원 성함을 입력하세요" type="text"/>
+</div>
+</div>
+<!-- Service Number Row -->
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-1 text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                서비스번호 (Service Number)
+                                <span class="text-xs font-bold text-red-500">필수</span>
+</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-3 flex items-center text-slate-400">
+<span class="material-symbols-outlined text-xl">tag</span>
+</span>
+<input class="h-12 w-full rounded-lg border-slate-200 bg-white pl-10 text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800" placeholder="SVR-0000-0000" type="text"/>
+</div>
+</div>
+<!-- Key Type & Quantity Row -->
+<div class="grid grid-cols-1 gap-x-12 gap-y-8 md:grid-cols-2">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">종류 (Key Type)</label>
+<select class="h-12 w-full rounded-lg border-slate-200 bg-white text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800">
+<option value="">카드키 종류를 선택하세요</option>
+<option value="standard">표준형 마그네틱</option>
+<option value="rfid">RFID 비접촉식</option>
+<option value="mobile">모바일 디지털키</option>
+<option value="premium">프리미엄 보안키</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">수량 (Quantity)</label>
+<div class="flex items-center">
+<input class="h-12 w-full rounded-lg border-slate-200 bg-white text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800" min="1" type="number" value="1"/>
+<span class="ml-3 text-sm text-slate-500">개</span>
+</div>
+</div>
+</div>
+<!-- Notes Row -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">비고 (Notes)</label>
+<textarea class="w-full rounded-lg border-slate-200 bg-white text-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800" placeholder="특이사항이나 추가 요청사항을 입력하세요" rows="4"></textarea>
+</div>
+<!-- Submit Section -->
+<div class="flex items-center justify-between border-t border-slate-100 pt-10 dark:border-slate-800">
+<div class="flex items-center gap-2 text-sm text-slate-500">
+<span class="material-symbols-outlined text-base">info</span>
+                                등록된 데이터는 즉시 지사 재고에 반영됩니다.
+                            </div>
+<div class="flex gap-4">
+<button class="px-6 py-3 text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" type="reset">초기화</button>
+<button class="inline-flex items-center gap-2 rounded-lg bg-primary px-10 py-3 text-base font-bold text-white shadow-lg shadow-primary/25 transition-all hover:bg-blue-700 hover:shadow-primary/40 active:scale-95" type="submit">
+<span class="material-symbols-outlined text-xl">check_circle</span>
+                                    등록하기
+                                </button>
+</div>
+</div>
+</div>
+</form>
+</div>
+<!-- Footer Meta Info -->
+<div class="mt-12 flex flex-col items-center justify-between gap-6 border-t border-slate-200 pt-8 text-sm text-slate-500 dark:border-slate-800 md:flex-row">
+<p>© 2024 Deep Blue Management System. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary" href="#">개인정보처리방침</a>
+<a class="hover:text-primary" href="#">도움말 센터</a>
+<a class="hover:text-primary" href="#">시스템 상태</a>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

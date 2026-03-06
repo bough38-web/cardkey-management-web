@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Premium Card Key Sales - Variant 2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Noto+Sans+KR:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #f8fafc;
+            --primary-sapphire: #0f172a;
+            --primary-sapphire-light: #1e293b;
+            --neumorphic-shadow-outer: 20px 20px 60px #d1d9e6, -20px -20px 60px #ffffff;
+            --neumorphic-shadow-inner: inset 2px 2px 5px #babecc, inset -5px -5px 10px #ffffff;
+            --button-gradient: radial-gradient(circle at top left, #1e293b, #0f172a);
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: #334155;
+        }
+        .premium-card {
+            background: var(--card-bg);
+            box-shadow: var(--neumorphic-shadow-outer);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .premium-input {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .premium-input:focus {
+            outline: none;
+            box-shadow: var(--neumorphic-shadow-inner);
+            border-color: #cbd5e1;
+            background: #f1f5f9;
+        }
+        .glass-header {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .sapphire-btn {
+            background: var(--button-gradient);
+            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.3), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
+            transition: all 0.3s ease;
+        }
+        .sapphire-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.4), 0 10px 10px -5px rgba(15, 23, 42, 0.1);
+        }textarea::-webkit-scrollbar {
+            width: 6px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<header class="glass-header sticky top-0 z-50 w-full h-20">
+<div class="max-w-7xl mx-auto px-8 h-full flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg">
+<span class="material-symbols-outlined text-2xl">key</span>
+</div>
+<div class="flex flex-col">
+<span class="text-lg font-bold tracking-tight text-slate-900">Card Key Pro</span>
+<span class="text-[10px] font-medium text-slate-500 uppercase tracking-widest leading-none">Management System</span>
+</div>
+</div>
+<nav class="hidden lg:flex items-center gap-10">
+<a class="text-sm font-semibold text-slate-400 hover:text-slate-900 transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-semibold text-slate-900 border-b-2 border-slate-900 pb-1" href="#">Sales Entry</a>
+<a class="text-sm font-semibold text-slate-400 hover:text-slate-900 transition-colors" href="#">Inventory</a>
+<a class="text-sm font-semibold text-slate-400 hover:text-slate-900 transition-colors" href="#">Analytics</a>
+</nav>
+<div class="flex items-center gap-6">
+<button class="text-slate-500 hover:text-slate-900 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 pl-6 border-l border-slate-200">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold text-slate-900">관리자 계정</p>
+<p class="text-[10px] text-slate-400">admin@cardpro.com</p>
+</div>
+<img alt="Profile" class="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBt_K12wdTt-3ApnZeSBS9X0g49rK0865uq2ZsVlSAZ8QzKDHjgKMnl6lP09pxcIiULiiOE-PBPOxWQd-gP9BAT6psfhVJzXbqRpy4TKNfj4kS0nDxHUgAd-Tt4ykwXytjijwCaKxJI8SkMGeVMDOcJynKKX526eVkVoYdeJ7FiK7eZKpjG1jBjJnv2qShLL5v-nue-4kI4Z3-U2kOblcZclxKpTjXyk8rpZkIDSrvhjVpL5dBnEzMzllu_CkQLRngbtfY_Vt_-3TgL"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 py-16 px-6">
+<div class="max-w-5xl mx-auto">
+<div class="mb-12 text-center">
+<span class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-3 block">Sales Registration</span>
+<h2 class="text-4xl font-light text-slate-900 tracking-tight mb-4">카드키 판매 등록</h2>
+<div class="h-1 w-20 bg-slate-900 mx-auto rounded-full"></div>
+</div>
+<div class="premium-card overflow-hidden">
+<div class="px-10 py-8 bg-white/40 border-b border-white/50">
+<h3 class="text-xl font-semibold text-slate-800 flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">description</span>
+                    판매 정보 입력
+                </h3>
+</div>
+<form class="p-12 space-y-12">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-10">
+<div class="flex flex-row items-center gap-6">
+<label class="w-28 text-sm font-bold text-slate-600 shrink-0">지사</label>
+<select class="premium-input w-full h-12 px-4 rounded-xl text-sm focus:ring-0 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_1rem_center] bg-no-repeat">
+<option value="">지사를 선택하십시오</option>
+<option>서울 본사</option>
+<option>부산 지사</option>
+<option>인천 지사</option>
+<option>대전 지사</option>
+</select>
+</div>
+<div class="flex flex-row items-center gap-6">
+<label class="w-28 text-sm font-bold text-slate-600 shrink-0">사원명</label>
+<input class="premium-input w-full h-12 px-4 rounded-xl text-sm focus:ring-0" placeholder="성함을 입력하세요" type="text"/>
+</div>
+<div class="flex flex-row items-center gap-6">
+<label class="w-28 text-sm font-bold text-slate-600 shrink-0 flex items-center">
+                            서비스번호 <span class="text-blue-500 ml-1">*</span>
+</label>
+<div class="relative w-full">
+<input class="premium-input w-full h-12 px-4 rounded-xl text-sm focus:ring-0" placeholder="SVC-0000-00" required="" type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 text-lg">info</span>
+</div>
+</div>
+<div class="flex flex-row items-center gap-6">
+<label class="w-28 text-sm font-bold text-slate-600 shrink-0">종류</label>
+<select class="premium-input w-full h-12 px-4 rounded-xl text-sm focus:ring-0 appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px_20px] bg-[right_1rem_center] bg-no-repeat">
+<option value="">종류를 선택하십시오</option>
+<option>Premium Card (Silver)</option>
+<option>Luxury Key Fob</option>
+<option>Standard RFID</option>
+<option>NFC Sticker</option>
+</select>
+</div>
+<div class="flex flex-row items-center gap-6">
+<label class="w-28 text-sm font-bold text-slate-600 shrink-0">수량</label>
+<input class="premium-input w-full h-12 px-4 rounded-xl text-sm focus:ring-0" min="1" type="number" value="1"/>
+</div>
+</div>
+<div class="flex flex-row items-start gap-6 pt-4">
+<label class="w-28 text-sm font-bold text-slate-600 shrink-0 pt-3">비고</label>
+<textarea class="premium-input w-full p-5 rounded-2xl text-sm focus:ring-0 resize-none" placeholder="추가 전달사항이나 특이사항을 입력해 주세요." rows="4"></textarea>
+</div>
+<div class="flex justify-center pt-8">
+<button class="sapphire-btn px-16 h-14 rounded-2xl text-white font-semibold text-base tracking-widest flex items-center gap-3 active:scale-[0.98]" type="submit">
+<span>등록하기</span>
+<span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+<div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-slate-400">shield</span>
+<div>
+<h4 class="text-xs font-bold text-slate-700 mb-1">보안 강화됨</h4>
+<p class="text-[11px] text-slate-400">모든 데이터는 AES-256 암호화 방식으로 전송 및 저장됩니다.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-slate-400">history</span>
+<div>
+<h4 class="text-xs font-bold text-slate-700 mb-1">실시간 로그</h4>
+<p class="text-[11px] text-slate-400">등록 즉시 관리 시스템 및 재고 현황에 반영됩니다.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-slate-400">support_agent</span>
+<div>
+<h4 class="text-xs font-bold text-slate-700 mb-1">시스템 지원</h4>
+<p class="text-[11px] text-slate-400">문제가 발생할 경우 IT 지원부서(내선 104)로 문의바랍니다.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="py-10 border-t border-slate-200 mt-20">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-xs text-slate-400 tracking-wide">© 2024 Premium Card Key Management. All rights reserved.</p>
+<div class="flex gap-8">
+<a class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter hover:text-slate-900 transition-colors" href="#">Privacy Policy</a>
+<a class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter hover:text-slate-900 transition-colors" href="#">Terms of Service</a>
+<a class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter hover:text-slate-900 transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+
+</body></html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KeyGuard Enterprise 관리자 대시보드 - Midnight Emerald</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df280",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#0a1410",
+                        "emerald-deep": "#102219",
+                        "emerald-glass": "rgba(16, 34, 25, 0.8)",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(22, 48, 36, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(13, 242, 128, 0.1);
+        }
+        .emerald-glow {
+            box-shadow: 0 0 20px rgba(13, 242, 128, 0.15);
+        }
+        .gradient-button {
+            background: linear-gradient(135deg, #0df280 0%, #06a95b 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-72 bg-emerald-deep border-r border-emerald-deep/50 flex flex-col shrink-0">
+<div class="p-8 flex items-center gap-3">
+<div class="size-10 rounded-xl bg-primary flex items-center justify-center emerald-glow">
+<span class="material-symbols-outlined text-background-dark font-bold">key</span>
+</div>
+<div>
+<h1 class="text-slate-100 text-lg font-bold tracking-tight">KeyGuard</h1>
+<p class="text-primary/70 text-xs font-medium uppercase tracking-widest">Enterprise</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/20">
+<span class="material-symbols-outlined fill-1">dashboard</span>
+<span class="font-semibold">대시보드</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-slate-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined">description</span>
+<span class="font-medium">판매 양식</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-slate-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-medium">재고 관리</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-slate-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined">apartment</span>
+<span class="font-medium">지사 현황</span>
+</div>
+</nav>
+<div class="p-4 mt-auto space-y-2 border-t border-white/5">
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-slate-100 transition-all cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">설정</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium">로그아웃</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-y-auto scrollbar-hide bg-[#0c1a14]">
+<!-- Top Header -->
+<header class="h-20 border-b border-white/5 flex items-center justify-between px-10 shrink-0 glass-panel sticky top-0 z-10">
+<div class="flex items-center gap-8">
+<h2 class="text-xl font-bold text-slate-100">관리자 대시보드</h2>
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 scale-90">search</span>
+<input class="w-full bg-emerald-deep/50 border-white/10 rounded-xl pl-10 text-sm focus:ring-primary focus:border-primary text-slate-100 placeholder:text-slate-500" placeholder="통합 검색..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-lg text-slate-400 hover:bg-white/5">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<button class="p-2 rounded-lg text-slate-400 hover:bg-white/5 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+</button>
+<div class="h-8 w-px bg-white/10 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-sm font-bold text-slate-100 leading-none">김관리 팀장</p>
+<p class="text-[10px] text-primary font-medium uppercase mt-1">Super Admin</p>
+</div>
+<div class="size-10 rounded-full border-2 border-primary/20 p-0.5">
+<img class="size-full rounded-full object-cover" data-alt="Admin user profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkUyI5EHOJSjokcAhMHd855scZnSfrlOln8O2huj1-k82J3xolcC2gJsXHvGxoJeafnv0UaVqUNeyVeVgGgNx7KTMN76tz3zDFuzJEDdZjlx_u-D6fMPBV887P0V7CVQNzGS4NY1IxI_mEvTgKFmL-u_Ndd2UZB664q3GOUHxN0-q_1G32PZjIOx1uuLEpCkQAHkrE4gmdkOPmmuGR1fyVmM48JpSqEHdcZf2obZje9THXzn9ZeYbR3zvdmbvVbVIw4H81M-fI8a4I"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-10 space-y-8">
+<!-- Stats Grid -->
+<div class="grid grid-cols-4 gap-6">
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">payments</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">총 판매량</p>
+<div class="mt-2 flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-slate-100 tracking-tight">128,400</h3>
+<span class="text-primary text-sm font-bold bg-primary/10 px-2 py-0.5 rounded-lg mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span>+5.2%
+                            </span>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">show_chart</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">월간 성장률</p>
+<div class="mt-2 flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-slate-100 tracking-tight">+12.5%</h3>
+<span class="text-primary text-sm font-bold bg-primary/10 px-2 py-0.5 rounded-lg mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span>+2.1%
+                            </span>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">location_on</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">활성 지사</p>
+<div class="mt-2 flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-slate-100 tracking-tight">42</h3>
+<span class="text-primary text-sm font-bold bg-primary/10 px-2 py-0.5 rounded-lg mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_up</span>+1
+                            </span>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden group hover:border-primary/30 transition-all duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl">pending_actions</span>
+</div>
+<p class="text-slate-400 text-sm font-medium">미출고 건수</p>
+<div class="mt-2 flex items-end justify-between">
+<h3 class="text-3xl font-extrabold text-slate-100 tracking-tight">156</h3>
+<span class="text-rose-500 text-sm font-bold bg-rose-500/10 px-2 py-0.5 rounded-lg mb-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">trending_down</span>-1.2%
+                            </span>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Sales Trend Chart -->
+<div class="col-span-8 glass-panel rounded-2xl p-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold text-slate-100">판매 트렌드 (Sales Trend)</h3>
+<p class="text-slate-400 text-sm">지난 6개월간 카드키 판매량 추이</p>
+</div>
+<button class="gradient-button text-background-dark font-bold text-sm px-6 py-2.5 rounded-xl flex items-center gap-2 emerald-glow hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg">download</span>
+                                엑셀 다운로드
+                            </button>
+</div>
+<div class="h-64 relative flex flex-col justify-between">
+<div class="absolute inset-0 flex items-end pb-8">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0df280" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#0df280" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 C100,120 150,180 250,100 C350,20 450,140 600,60 C700,10 750,50 800,40 V200 H0 Z" fill="url(#chartGradient)"></path>
+<path d="M0,150 C100,120 150,180 250,100 C350,20 450,140 600,60 C700,10 750,50 800,40" fill="none" stroke="#0df280" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+</div>
+<!-- Labels -->
+<div class="flex justify-between text-xs font-bold text-slate-500 pt-60">
+<span>1월</span><span>2월</span><span>3월</span><span>4월</span><span>5월</span><span>6월</span>
+</div>
+</div>
+</div>
+<!-- Branch Performance -->
+<div class="col-span-4 glass-panel rounded-2xl p-8">
+<h3 class="text-lg font-bold text-slate-100 mb-6">지사별 실적 (Performance)</h3>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-200 font-medium">서울 본사</span>
+<span class="text-primary font-bold">92%</span>
+</div>
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary emerald-glow rounded-full w-[92%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-200 font-medium">인천 지사</span>
+<span class="text-primary font-bold">84%</span>
+</div>
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary emerald-glow rounded-full w-[84%] opacity-80"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-200 font-medium">부산 지사</span>
+<span class="text-primary font-bold">76%</span>
+</div>
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary emerald-glow rounded-full w-[76%] opacity-60"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-200 font-medium">대전 지사</span>
+<span class="text-primary font-bold">61%</span>
+</div>
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary emerald-glow rounded-full w-[61%] opacity-40"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-sm">
+<span class="text-slate-200 font-medium">광주 지사</span>
+<span class="text-primary font-bold">45%</span>
+</div>
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary emerald-glow rounded-full w-[45%] opacity-30"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Table -->
+<div class="glass-panel rounded-2xl overflow-hidden">
+<div class="p-8 border-b border-white/5 flex items-center justify-between">
+<h3 class="text-lg font-bold text-slate-100">최근 활동 내역 (Recent Activity)</h3>
+<button class="text-primary text-sm font-bold hover:underline">전체 보기</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-slate-500 text-xs font-bold uppercase tracking-wider bg-white/5">
+<th class="px-8 py-4">지사명</th>
+<th class="px-8 py-4">주문 내역</th>
+<th class="px-8 py-4">금액</th>
+<th class="px-8 py-4">상태</th>
+<th class="px-8 py-4">날짜</th>
+<th class="px-8 py-4 text-right">관리</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-emerald-deep flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-sm">apartment</span>
+</div>
+<span class="text-sm font-semibold text-slate-200">서울 강남지사</span>
+</div>
+</td>
+<td class="px-8 py-5 text-sm text-slate-400">NFC 마스터키 x 500</td>
+<td class="px-8 py-5 text-sm font-bold text-slate-200">₩1,250,000</td>
+<td class="px-8 py-5">
+<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary uppercase">완료</span>
+</td>
+<td class="px-8 py-5 text-sm text-slate-500">2023.10.24 14:22</td>
+<td class="px-8 py-5 text-right">
+<button class="text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-emerald-deep flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-sm">apartment</span>
+</div>
+<span class="text-sm font-semibold text-slate-200">경기 수지센터</span>
+</div>
+</td>
+<td class="px-8 py-5 text-sm text-slate-400">RFID 보안태그 x 1200</td>
+<td class="px-8 py-5 text-sm font-bold text-slate-200">₩3,120,000</td>
+<td class="px-8 py-5">
+<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 uppercase">진행중</span>
+</td>
+<td class="px-8 py-5 text-sm text-slate-500">2023.10.24 13:05</td>
+<td class="px-8 py-5 text-right">
+<button class="text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-8 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-lg bg-emerald-deep flex items-center justify-center text-primary border border-primary/20">
+<span class="material-symbols-outlined text-sm">apartment</span>
+</div>
+<span class="text-sm font-semibold text-slate-200">부산 해운대 본점</span>
+</div>
+</td>
+<td class="px-8 py-5 text-sm text-slate-400">임원용 프리미엄키 x 20</td>
+<td class="px-8 py-5 text-sm font-bold text-slate-200">₩840,000</td>
+<td class="px-8 py-5">
+<span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-500 uppercase">지연</span>
+</td>
+<td class="px-8 py-5 text-sm text-slate-500">2023.10.23 18:40</td>
+<td class="px-8 py-5 text-right">
+<button class="text-slate-500 group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="dark" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Premium Card Key Registration - Variant 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&amp;family=Noto+Sans+KR:wght@100;300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "charcoal": "#0a0c10",
+                        "navy-depth": "#0f172a",
+                        "emerald-accent": "#10b981",
+                        "teal-accent": "#14b8a6",
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "Noto Sans KR", "sans-serif"],
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'premium': '0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 20px 1px rgba(255, 255, 255, 0.05)',
+                        'inner-glow': 'inset 0 1px 1px 0 rgba(255, 255, 255, 0.05)',
+                        'emerald-glow': '0 0 20px rgba(16, 185, 129, 0.4)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-[#080a0f] text-slate-200 antialiased selection:bg-emerald-500/30;
+                background: radial-gradient(circle at top right, #1e293b 0%, #080a0f 60%);
+            }
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-input {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-input:focus {
+            background: rgba(0, 0, 0, 0.4);
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.1), 0 0 0 2px rgba(16, 185, 129, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .light-reflect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<header class="w-full border-b border-white/5 bg-charcoal/40 backdrop-blur-xl">
+<div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-3">
+<div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white shadow-emerald-glow">
+<span class="material-symbols-outlined text-2xl">key</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-white uppercase">Premium Key</span>
+</div>
+<nav class="hidden lg:flex items-center gap-10">
+<a class="text-sm font-semibold text-emerald-400" href="#">판매 현황</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">재고 관리</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">지사 정보</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">시스템 설정</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden xl:block">
+<span class="absolute inset-y-0 left-4 flex items-center text-slate-500">
+<span class="material-symbols-outlined text-xl">search</span>
+</span>
+<input class="h-11 w-72 rounded-xl border-white/5 bg-white/5 pl-12 text-sm text-slate-200 placeholder:text-slate-600 focus:border-emerald-500/50 focus:ring-0" placeholder="통합 검색..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all border border-white/5">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="group relative flex items-center gap-3 pl-4 border-l border-white/10">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold text-white">관리자</p>
+<p class="text-[10px] text-slate-500">Global Admin</p>
+</div>
+<div class="h-11 w-11 overflow-hidden rounded-xl border-2 border-white/10 group-hover:border-emerald-500/50 transition-all">
+<img alt="Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZMDK-cdooTIRIvFXGsPfgBB35ql1o39t_wqyU00u6RJoF9Uc5jBN8_TGEZ3rBVna-1nUTNH1YpiIAvQKAi1k8uyPuD2ma1DASre7VuoSF6N_19OR07RFN6TA67poGELbJgZ2jmVypvd3pHpwJsQ328vadS8pyTbGUALIgfYng9re31coPTlVD4ccvn5-TsNUqs14-raacK5YOkgG--EQiKV4CskctMdCmwUDP7e5qOrpOE-WSsYedADH2ukBtMYMajpX5oFvZtVcW"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 py-16 px-8 relative">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-teal-500/5 rounded-full blur-[150px] pointer-events-none"></div>
+<div class="mx-auto max-w-5xl">
+<div class="mb-14 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+<div class="space-y-4">
+<nav class="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.2em] text-emerald-500/80">
+<span>Admin</span>
+<span class="w-1 h-1 rounded-full bg-slate-700"></span>
+<span>Sales</span>
+<span class="w-1 h-1 rounded-full bg-slate-700"></span>
+<span class="text-slate-500">Registration</span>
+</nav>
+<h1 class="text-4xl font-extrabold tracking-tight text-white lg:text-5xl font-display">
+                    카드키 판매 등록
+                </h1>
+<p class="max-w-xl text-lg text-slate-400 font-light leading-relaxed">
+                    시스템의 보안 무결성을 보장하기 위해 정확한 판매 정보를 입력해 주십시오. 
+                    <span class="text-emerald-500/60">모든 트랜잭션은 암호화되어 기록됩니다.</span>
+</p>
+</div>
+<div>
+<button class="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20">
+<span class="material-symbols-outlined text-lg transition-transform group-hover:-translate-x-1">west</span>
+                    목록으로 돌아가기
+                </button>
+</div>
+</div>
+<div class="glass-card relative overflow-hidden rounded-[2rem] shadow-premium">
+<div class="light-reflect"></div>
+<div class="border-b border-white/5 bg-white/[0.02] px-10 py-6">
+<div class="flex items-center justify-between">
+<h2 class="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-slate-400">
+<span class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                        기본 판매 정보
+                    </h2>
+<span class="text-[10px] text-slate-500 bg-white/5 px-2 py-1 rounded">DEEP-CH-01</span>
+</div>
+</div>
+<form class="p-10 lg:p-14">
+<div class="space-y-12">
+<div class="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2">
+<div class="flex flex-col gap-3">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">지사 (Branch)</label>
+<div class="relative group">
+<select class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium text-white focus:ring-0 appearance-none">
+<option class="bg-navy-depth" value="">지사를 선택하세요</option>
+<option class="bg-navy-depth" value="seoul">서울 본사</option>
+<option class="bg-navy-depth" value="busan">부산 지사</option>
+<option class="bg-navy-depth" value="daegu">대구 지사</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">사원명 (Worker Name)</label>
+<input class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium text-white placeholder:text-slate-600 focus:ring-0" placeholder="담당 사원 성함" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<label class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">
+                            서비스번호 (Service Number)
+                            <span class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-500 border border-emerald-500/20">REQUIRED</span>
+</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-5 flex items-center text-emerald-500/50">
+<span class="material-symbols-outlined text-xl">fingerprint</span>
+</span>
+<input class="glass-input h-14 w-full rounded-2xl pl-14 pr-5 text-sm font-medium text-white placeholder:text-slate-600 focus:ring-0" placeholder="SVR-0000-0000" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2">
+<div class="flex flex-col gap-3">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">종류 (Key Type)</label>
+<div class="relative group">
+<select class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium text-white focus:ring-0 appearance-none">
+<option class="bg-navy-depth" value="">종류 선택</option>
+<option class="bg-navy-depth" value="premium">프리미엄 보안키 (P-TYPE)</option>
+<option class="bg-navy-depth" value="rfid">RFID 비접촉식</option>
+<option class="bg-navy-depth" value="mobile">모바일 디지털키</option>
+</select>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">수량 (Quantity)</label>
+<div class="flex items-center gap-4">
+<input class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium text-white focus:ring-0" min="1" type="number" value="1"/>
+<span class="text-sm font-bold text-slate-500 shrink-0">EA</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<label class="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">비고 (Notes)</label>
+<textarea class="glass-input w-full rounded-2xl p-5 text-sm font-medium text-white placeholder:text-slate-600 focus:ring-0 min-h-[120px]" placeholder="추가 전달 사항 또는 특이 정보를 입력하십시오..."></textarea>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-8 pt-6 border-t border-white/5">
+<div class="flex items-center gap-3 text-xs text-slate-500 font-medium bg-white/[0.03] px-4 py-2 rounded-full border border-white/5">
+<span class="material-symbols-outlined text-base text-emerald-500">verified_user</span>
+                            데이터는 실시간 동기화되어 재고에 즉시 반영됩니다.
+                        </div>
+<div class="flex items-center gap-6 w-full sm:w-auto">
+<button class="text-sm font-bold text-slate-400 hover:text-white transition-colors px-4" type="reset">Reset</button>
+<button class="relative flex-1 sm:flex-none inline-flex items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 px-12 py-4 text-base font-extrabold text-white shadow-emerald-glow transition-all hover:scale-[1.02] hover:brightness-110 active:scale-95 overflow-hidden" type="submit">
+<span class="material-symbols-outlined text-xl">token</span>
+                                등록하기
+                            </button>
+</div>
+</div>
+</div>
+</form>
+</div>
+<footer class="mt-20 flex flex-col items-center justify-between gap-8 border-t border-white/5 pt-10 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-600 md:flex-row">
+<p>© 2024 Premium Management Infrastructure</p>
+<div class="flex gap-10">
+<a class="hover:text-emerald-500 transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-emerald-500 transition-colors" href="#">Service Status</a>
+<a class="hover:text-emerald-500 transition-colors" href="#">Admin Portal</a>
+</div>
+</footer>
+</div>
+</main>
+
+</body></html>
