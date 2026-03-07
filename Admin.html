@@ -1373,25 +1373,25 @@
             const modal = document.getElementById('superAdminModal');
             const title = document.getElementById('saModalTitle');
             const actionType = document.getElementById('saActionType');
-
-            // Groups
             const userGroup = document.getElementById('saUserSelectGroup');
             const nameGroup = document.getElementById('saNameGroup');
             const branchGroup = document.getElementById('saBranchGroup');
             const pwdGroup = document.getElementById('saPasswordGroup');
+            const targetSelect = document.getElementById('saTargetUser');
 
-            // Reset Groups
+            // Reset UI
             userGroup.classList.add('hidden');
             nameGroup.classList.add('hidden');
             branchGroup.classList.add('hidden');
             pwdGroup.classList.add('hidden');
-
             actionType.value = action;
+            targetSelect.innerHTML = '<option value="">불러오는 중...</option>';
 
             if (action === 'reset') {
                 title.innerHTML = '패스워드 <span class="text-rose-500">초기화</span>';
                 userGroup.classList.remove('hidden');
                 pwdGroup.classList.remove('hidden');
+                fetchAdminUsers();
             } else if (action === 'register') {
                 title.innerHTML = '관리자 <span class="text-theme">등록</span>';
                 nameGroup.classList.remove('hidden');
@@ -1402,9 +1402,29 @@
                 userGroup.classList.remove('hidden');
                 nameGroup.classList.remove('hidden');
                 branchGroup.classList.remove('hidden');
+                fetchAdminUsers();
             }
-
             modal.classList.remove('hidden');
+        }
+
+        function fetchAdminUsers() {
+            if (typeof google !== 'undefined') {
+                google.script.run.withSuccessHandler(users => {
+                    const sel = document.getElementById('saTargetUser');
+                    sel.innerHTML = '<option value="">대상 선택</option>';
+                    users.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.id;
+                        opt.textContent = `${u.name} (${u.branch}/${u.role})`;
+                        sel.appendChild(opt);
+                    });
+                }).getAdminUsers();
+            } else {
+                document.getElementById('saTargetUser').innerHTML = `
+                    <option value="">대상 선택</option>
+                    <option value="admin">최고관리자 (Local)</option>
+                `;
+            }
         }
 
         function closeSuperAdminModal() {
@@ -1415,9 +1435,61 @@
         document.getElementById('saForm').onsubmit = function (e) {
             e.preventDefault();
             const action = document.getElementById('saActionType').value;
-            showToast(`[슈퍼관리자 도구] ${action} 기능 적용이 완료되었습니다.<br><span class="text-xs opacity-70">실제 연동 전 프론트엔드 모의 작동 완료됨</span>`,
-                'success');
-            closeSuperAdminModal();
+            const targetId = document.getElementById('saTargetUser').value;
+            const name = document.getElementById('saNameName').value.trim();
+            const branch = document.getElementById('saBranch').value;
+            const password = document.getElementById('saPassword').value;
+
+            const btn = this.querySelector('button[type="submit"]');
+            const origText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> 처리 중...';
+            btn.disabled = true;
+
+            const successHandler = (res) => {
+                showToast(res.message, res.success ? 'success' : 'error');
+                if (res.success) closeSuperAdminModal();
+                btn.innerHTML = origText;
+                btn.disabled = false;
+            };
+
+            const failureHandler = (err) => {
+                showToast("오류 발생: " + err.message, 'error');
+                btn.innerHTML = origText;
+                btn.disabled = false;
+            };
+
+            if (typeof google === 'undefined') {
+                setTimeout(() => {
+                    showToast(`[로컬 시뮬레이션] ${action} 요청이 처리되었습니다.`, 'info');
+                    closeSuperAdminModal();
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                }, 800);
+                return;
+            }
+
+            if (action === 'reset') {
+                if (!targetId || !password) {
+                    showToast("대상과 새 비밀번호를 입력해주세요.", "warning");
+                    btn.innerHTML = origText; btn.disabled = false; return;
+                }
+                google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
+                    .resetAdminPassword(targetId, password);
+            } else if (action === 'register') {
+                if (!name || !password) {
+                    showToast("이름과 비밀번호는 필수입니다.", "warning");
+                    btn.innerHTML = origText; btn.disabled = false; return;
+                }
+                google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
+                    .registerAdmin({ name, branch, password, userId: 'admin_' + Date.now() });
+            } else if (action === 'edit') {
+                if (!targetId) {
+                    showToast("대상을 선택해주세요.", "warning");
+                    btn.innerHTML = origText; btn.disabled = false; return;
+                }
+                google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
+                    .updateAdminInfo({ userId: targetId, name, branch });
+            }
         };
 
         // --- Worker Registration Logic ---

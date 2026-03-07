@@ -35,16 +35,29 @@ function doGet(e) {
 }
 
 /**
- * 단순 비밀번호 인증 (사용자 요구사항)
- * 중앙: 1234, 관리자: admin1234
+ * 4. 실시간 관리자 인증 (시트 연동)
  */
 function checkLogin(password) {
-  if (password === '1234') {
-    return { success: true, role: 'Branch', branch: '중앙', redirect: 'Index' };
-  } else if (password === 'admin1234') {
-    return { success: true, role: 'Admin', branch: 'HQ', redirect: 'Admin' };
+  try {
+    const sheet = getAdminSheet();
+    const data = sheet.getDataRange().getValues();
+    data.shift(); // 헤더 제거
+    
+    for (let row of data) {
+      if (row[2].toString() === password.toString()) {
+        return { 
+          success: true, 
+          role: row[3], 
+          branch: row[4], 
+          userName: row[1],
+          redirect: row[3] === 'Admin' ? 'Admin' : 'Index' 
+        };
+      }
+    }
+    return { success: false, message: '비밀번호가 올바르지 않습니다.' };
+  } catch (e) {
+    return { success: false, message: '인증 시스템 오류: ' + e.message };
   }
-  return { success: false, message: '비밀번호가 올바르지 않습니다.' };
 }
 
 // 현장 직원용 입력 폼 호출 (기존 수동 호출용)
@@ -368,4 +381,93 @@ function getDashboardData(role, branchFilter, year, month, day) {
   });
 
   return stats;
+}
+
+/**
+ * 6. 슈퍼 관리자 도구 (Admin Management)
+ */
+function getAdminSheet() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('관리자정보');
+  if (!sheet) {
+    sheet = ss.insertSheet('관리자정보');
+    sheet.appendRow(['사용자ID', '성명', '비밀번호', '권한', '지사']);
+    // 초기 관리자 계정 생성
+    sheet.appendRow(['admin', '최고관리자', 'admin1234', 'Admin', 'HQ']);
+    sheet.appendRow(['branch_test', '중앙지사장', '1234', 'Branch', '중앙']);
+    
+    // 포맷팅
+    sheet.getRange(1, 1, 1, 5).setBackground('#10b981').setFontColor('white').setFontWeight('bold');
+  }
+  return sheet;
+}
+
+function getAdminUsers() {
+  try {
+    const sheet = getAdminSheet();
+    const data = sheet.getDataRange().getValues();
+    data.shift(); // 헤더 제거
+    
+    return data.map(row => ({
+      id: row[0],
+      name: row[1],
+      role: row[3],
+      branch: row[4]
+    }));
+  } catch (e) {
+    Logger.log("Error in getAdminUsers: " + e.message);
+    return [];
+  }
+}
+
+function resetAdminPassword(userId, newPassword) {
+  try {
+    const sheet = getAdminSheet();
+    const data = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === userId) {
+        sheet.getRange(i + 1, 3).setValue(newPassword);
+        return { success: true, message: `${data[i][1]}(${userId})님의 비밀번호가 초기화되었습니다.` };
+      }
+    }
+    return { success: false, message: "사용자를 찾을 수 없습니다." };
+  } catch (e) {
+    return { success: false, message: "비밀번호 초기화 중 오류 발생: " + e.message };
+  }
+}
+
+function registerAdmin(data) {
+  try {
+    const sheet = getAdminSheet();
+    sheet.appendRow([
+      data.userId || "user_" + Math.floor(Date.now() / 1000), // ID 자동생성 또는 입력
+      data.name,
+      data.password,
+      data.role || 'Admin',
+      data.branch || 'HQ'
+    ]);
+    return { success: true, message: `${data.name} 관리자가 등록되었습니다.` };
+  } catch (e) {
+    return { success: false, message: "관리자 등록 중 오류 발생: " + e.message };
+  }
+}
+
+function updateAdminInfo(data) {
+  try {
+    const sheet = getAdminSheet();
+    const values = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < values.length; i++) {
+      if (values[i][0] === data.userId) {
+        sheet.getRange(i + 1, 2).setValue(data.name);
+        sheet.getRange(i + 1, 4).setValue(data.role);
+        sheet.getRange(i + 1, 5).setValue(data.branch);
+        return { success: true, message: "정보가 성공적으로 수정되었습니다." };
+      }
+    }
+    return { success: false, message: "사용자를 찾을 수 없습니다." };
+  } catch (e) {
+    return { success: false, message: "수정 중 오류 발생: " + e.message };
+  }
 }
