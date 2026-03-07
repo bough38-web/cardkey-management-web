@@ -102,11 +102,13 @@ function processForm(data) {
   const rawSheet = ss.getSheetByName('판매내역') || ss.insertSheet('판매내역');
   
   if (rawSheet.getLastRow() === 0) {
-    rawSheet.appendRow(['일자', '지사', '사원명', '서비스번호', '종류1', '종류2', '수량', '단가', '합계액', '비고']);
+    rawSheet.appendRow(['일자', '지사', '사원명', '서비스번호', '종류1', '종류2', '수량', '단가', '합계액', '비고', '판매구분']);
   }
   
-  const unitPrice = 3000;
-  const totalPrice = parseInt(data.qty) * unitPrice;
+  const saleType = data.saleType || "paid";
+  const unitPrice = (saleType === 'free') ? 0 : 3000;
+  const qty = parseInt(data.qty) || 0;
+  const totalPrice = qty * unitPrice;
   
   rawSheet.appendRow([
     new Date(), 
@@ -115,10 +117,11 @@ function processForm(data) {
     data.serviceNo, 
     data.type1, 
     data.type2, 
-    data.qty, 
+    qty, 
     unitPrice,
     totalPrice, 
-    data.memo
+    data.memo,
+    saleType === 'free' ? "무상" : "유상"
   ]);
   
   return "판매 등록 완료되었습니다. (합계: " + totalPrice.toLocaleString() + "원)";

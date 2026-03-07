@@ -212,6 +212,15 @@
       border-color: rgba(var(--theme-rgb), 0.2);
       color: var(--theme);
     }
+
+    /* Ultra-small screen support for quantity buttons */
+    @media (max-width: 360px) {
+      .qty-btn {
+        min-width: 45px !important;
+        height: 44px !important;
+        font-size: 11px !important;
+      }
+    }
   </style>
 </head>
 
@@ -272,19 +281,29 @@
 
             <!-- Admin Dropdown Menu -->
             <div
-              class="absolute right-0 top-full mt-2 w-56 bg-theme-card border border-theme-border rounded-2xl shadow-premium opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] overflow-hidden backdrop-blur-xl">
-              <div class="px-5 py-4 border-b border-theme-border bg-white/[0.02]">
-                <p class="text-[10px] font-bold text-theme uppercase tracking-widest">Administrator</p>
+              class="absolute right-0 top-full mt-2 w-64 bg-theme-card border border-theme-border rounded-2xl shadow-premium opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[100] overflow-hidden backdrop-blur-xl">
+              <div class="px-5 py-3 border-b border-theme-border bg-white/[0.02]">
+                <p class="text-[10px] font-bold text-theme uppercase tracking-widest flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-theme animate-pulse"></span> Administrator Portal
+                </p>
               </div>
-              <a id="navDashboard" href="?page=Admin" target="_top"
-                class="flex items-center gap-3 px-5 py-4 text-xs font-bold text-theme-muted hover:text-theme-text hover:bg-white/5 transition-all no-underline">
-                <span class="material-symbols-outlined text-sm font-bold">monitoring</span>
-                대시보드
+              <a id="navDashboard" href="#" target="_top"
+                class="flex items-center justify-between px-5 py-4 text-xs font-bold text-theme-muted hover:text-theme-text hover:bg-white/5 transition-all no-underline group/btn">
+                <span class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-sm font-bold">monitoring</span>
+                  관리자 대시보드
+                </span>
+                <span
+                  class="material-symbols-outlined text-[10px] opacity-0 group-hover/btn:opacity-100 transition-opacity">chevron_right</span>
               </a>
-              <a id="navLogout" href="?logout=true"
-                class="flex items-center gap-3 px-5 py-4 text-xs font-bold text-rose-500 hover:bg-rose-500/5 transition-all no-underline border-t border-theme-border">
-                <span class="material-symbols-outlined text-sm font-bold">logout</span>
-                로그아웃
+              <a id="navLogout" href="#" target="_top"
+                class="flex items-center justify-between px-5 py-4 text-xs font-bold text-rose-500 hover:bg-rose-500/5 transition-all no-underline border-t border-theme-border group/btn">
+                <span class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-sm font-bold">logout</span>
+                  시스템 로그아웃
+                </span>
+                <span
+                  class="material-symbols-outlined text-[10px] opacity-0 group-hover/btn:opacity-100 transition-opacity">chevron_right</span>
               </a>
             </div>
           </div>
@@ -509,7 +528,7 @@
         <!-- Footer Meta Info -->
         <footer
           class="mt-20 flex flex-col items-center justify-between gap-8 border-t border-theme-border pt-10 text-[11px] font-bold uppercase tracking-[0.2em] text-theme-muted md:flex-row">
-          <p>© 2024 KeyGuard Management Infrastructure</p>
+          <p>© 2026 KeyGuard Management Infrastructure</p>
           <div class="flex gap-10">
             <a class="hover:text-theme transition-colors" href="#">Privacy Policy</a>
             <a class="hover:text-theme transition-colors" href="#">Service Status</a>
@@ -624,21 +643,27 @@
       calculateTotal();
     }
 
-    function calculateTotal() {
-      const gQty = document.getElementById('qty').value || 0;
-      const gPrice = 3000;
-      const gTotal = gQty * gPrice;
-      document.getElementById('total').value = gTotal.toLocaleString();
-    }
+
 
     // Initial setup
     function getAppOrigin() {
       try {
+        // First priority: document.referrer (Streamlit app URL)
         const ref = document.referrer;
-        if (ref && ref.includes('.streamlit.app')) {
-          return new URL(ref).origin;
+        if (ref && (ref.includes('.streamlit.app') || ref.includes('localhost'))) {
+          try {
+            return new URL(ref).origin;
+          } catch (e) { return ""; }
         }
-        return window.location.origin;
+
+        // Second priority: window.top if accessible
+        try {
+          if (window.top && window.top.location.origin) {
+            return window.top.location.origin;
+          }
+        } catch (e) { }
+
+        return "";
       } catch (e) {
         return "";
       }
@@ -657,8 +682,16 @@
       const params = `&auth=true&role=${userRole}${userBranch ? '&branch=' + encodeURIComponent(userBranch) : ''}`;
       const origin = getAppOrigin();
 
-      document.getElementById('navDashboard').href = (origin || "") + "/Admin_Dashboard?page=Admin" + params;
-      document.getElementById('navLogout').href = (origin || "") + "/Admin_Dashboard?logout=true";
+      // Clean origin to avoid trailing slash issues
+      const baseOrigin = origin ? origin.replace(/\/$/, '') : "";
+      const dashUrl = baseOrigin ? baseOrigin + "/?page=Admin" + params : "?page=Admin" + params;
+      const logoutUrl = baseOrigin ? baseOrigin + "/?logout=true" : "?logout=true";
+
+      const navDash = document.getElementById('navDashboard');
+      const navLogout = document.getElementById('navLogout');
+
+      if (navDash) navDash.href = dashUrl;
+      if (navLogout) navLogout.href = logoutUrl;
 
       if (userBranch && userBranch !== 'HQ') {
         document.getElementById('branch').value = userBranch;
@@ -748,21 +781,29 @@
       const btn = document.querySelector('#salesForm button[type="submit"]');
       const originalText = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = '처리 중...';
 
-      const data = {
-        branch: document.getElementById('branch').value,
-        worker: document.getElementById('worker').value,
-        serviceNo: document.getElementById('serviceNo').value,
-        type1: document.getElementById('type1').value,
-        type2: document.getElementById('type2').value,
-        qty: document.getElementById('qty').value,
-        saleType: document.getElementById('saleType').value,
-        memo: document.getElementById('memo').value
-      };
-
+      const branch = document.getElementById('branch');
+      const worker = document.getElementById('worker');
       const svcInput = document.getElementById('serviceNo');
-      if (!svcInput.value.trim()) {
+
+      if (!branch.value) {
+        showToast("지사를 먼저 선택해주세요.", 'error');
+        branch.focus();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        return;
+      }
+
+      if (!worker.value) {
+        showToast("사원명을 선택해주세요.", 'error');
+        worker.focus();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        return;
+      }
+
+      const svcVal = svcInput.value.trim();
+      if (!svcVal) {
         showToast("서비스번호를 입력해주세요.", 'error');
         svcInput.focus();
         btn.disabled = false;
@@ -770,28 +811,66 @@
         return;
       }
 
+      if (svcVal.length !== 8 || isNaN(svcVal)) {
+        showToast("서비스번호는 숫자 8자리로 입력해주세요. (예: 12345678)", 'error');
+        svcInput.focus();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        return;
+      }
+
+      const data = {
+        branch: branch.value,
+        worker: worker.value,
+        serviceNo: svcInput.value,
+        type1: document.getElementById('type1').value,
+        type2: document.getElementById('type2').value,
+        qty: document.getElementById('qty').value,
+        saleType: document.getElementById('saleType').value,
+        memo: document.getElementById('memo').value
+      };
+
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-xl">sync</span> 처리 중...';
+
       // 구글 앱스 스크립트 환경 대응
+      // Set a fallback timeout to reset the button after 15 seconds if no response
+      const processingTimeout = setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        showToast('서버 응답이 지연되어 처리 중 상태를 해제했습니다.', 'error');
+      }, 15000);
+
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(msg => {
-            showToast("✅ 저장 완료되었습니다.", 'success');
-            document.getElementById('salesForm').reset();
-            setSaleType('paid'); // Reset sale type to default
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+            try {
+              showToast("✅ 저장 완료되었습니다.", 'success');
+              document.getElementById('salesForm').reset();
+              setSaleType('paid'); // Reset sale type to default
+            } catch (err) {
+              console.error("Success handler error:", err);
+            } finally {
+              clearTimeout(processingTimeout);
+              btn.disabled = false;
+              btn.innerHTML = originalText;
+            }
           })
           .withFailureHandler(err => {
             showToast("오류가 발생했습니다: " + err.message, 'error');
+            clearTimeout(processingTimeout);
             btn.disabled = false;
             btn.innerHTML = originalText;
           })
           .processForm(data);
       } else {
         console.log("Local Preview Data:", data);
-        showToast("등록 완료되었습니다. (로컬 미리보기)", 'success');
-        document.getElementById('salesForm').reset();
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+        setTimeout(() => {
+          showToast("등록 완료되었습니다. (로컬 미리보기)", 'success');
+          document.getElementById('salesForm').reset();
+          clearTimeout(processingTimeout);
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }, 1000);
       }
     }
 

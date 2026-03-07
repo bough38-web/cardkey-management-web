@@ -98,6 +98,55 @@
             border: 1px solid var(--theme-border);
         }
 
+        /* Mobile Optimization for Admin Dashboard */
+        @media (max-width: 640px) {
+            .p-10 {
+                padding: 1.25rem !important;
+            }
+
+            .px-10 {
+                padding-left: 1.25rem !important;
+                padding-right: 1.25rem !important;
+            }
+
+            .py-10 {
+                padding-top: 1.5rem !important;
+                padding-bottom: 1.5rem !important;
+            }
+
+            .gap-8 {
+                gap: 1.25rem !important;
+            }
+
+            .gap-6 {
+                gap: 1rem !important;
+            }
+
+            .space-y-10> :not([hidden])~ :not([hidden]) {
+                margin-top: 1.5rem !important;
+            }
+
+            .rounded-\[2\.5rem\] {
+                border-radius: 1.5rem !important;
+            }
+
+            .p-8 {
+                padding: 1.25rem !important;
+            }
+
+            h2.text-xl {
+                font-size: 1.125rem !important;
+            }
+
+            .h-20 {
+                height: 4.5rem !important;
+            }
+
+            .h-80 {
+                height: 18rem !important;
+            }
+        }
+
         body {
             transition: background-color 0.5s ease;
             background-color: var(--theme-bg);
@@ -155,12 +204,12 @@
 
             <header
                 class="h-20 glass-panel sticky top-0 z-40 px-10 flex items-center justify-between border-b border-theme-border">
-                <div class="flex items-center gap-8">
+                <div class="flex items-center gap-4 sm:gap-8">
                     <button onclick="toggleSidebar()"
                         class="p-2 hover:bg-white/5 rounded-xl transition-colors text-theme-muted hover:text-theme">
                         <span class="material-symbols-outlined">menu_open</span>
                     </button>
-                    <h2 class="text-xl font-bold tracking-tight text-theme-text uppercase">모니터링 <span
+                    <h2 class="text-lg sm:text-xl font-bold tracking-tight text-theme-text uppercase">모니터링 <span
                             class="text-theme">인사이트</span></h2>
 
                     <!-- Filters -->
@@ -168,7 +217,8 @@
                         <select id="filterYear" onchange="loadData()"
                             class="bg-theme-input text-[10px] font-bold text-theme-muted uppercase tracking-widest border border-theme-border rounded-lg px-2 py-1 outline-none">
                             <option value="2024">2024</option>
-                            <option value="2025" selected>2025</option>
+                            <option value="2025">2025</option>
+                            <option value="2026" selected>2026</option>
                         </select>
                         <select id="filterMonth" onchange="loadData()"
                             class="bg-theme-input text-[10px] font-bold text-theme-muted uppercase tracking-widest border border-theme-border rounded-lg px-2 py-1 outline-none">
@@ -761,7 +811,7 @@
     <!-- Footer -->
     <footer
         class="mt-10 py-10 text-center border-t border-theme-border opacity-50 text-[10px] font-bold uppercase tracking-widest">
-        © 2024 KeyGuard Management Infrastructure • Secure Administration
+        © 2026 KeyGuard Management Infrastructure • Secure Administration
     </footer>
 
     <!-- Expert Options Modal -->
@@ -835,17 +885,11 @@
             const sidebar = document.getElementById('sidebar');
             isSidebarCollapsed = !isSidebarCollapsed;
             if (isSidebarCollapsed) {
-                sidebar.classList.replace('w-64', 'w-20');
-                sidebar.querySelectorAll('span:not(.material-symbols-outlined)').forEach(el => el.classList.add('hidden'));
-                sidebar.querySelector('h1')?.classList.add('hidden');
-                sidebar.querySelector('p')?.classList.add('hidden');
-                sidebar.querySelector('.p-8')?.classList.replace('p-8', 'p-4');
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-0', 'sm:w-20', '-translate-x-full', 'sm:translate-x-0');
             } else {
-                sidebar.classList.replace('w-20', 'w-64');
-                sidebar.querySelectorAll('span:not(.material-symbols-outlined)').forEach(el => el.classList.remove('hidden'));
-                sidebar.querySelector('h1')?.classList.remove('hidden');
-                sidebar.querySelector('p')?.classList.remove('hidden');
-                sidebar.querySelector('.p-4')?.classList.replace('p-4', 'p-8');
+                sidebar.classList.add('w-64');
+                sidebar.classList.remove('w-0', 'sm:w-20', '-translate-x-full', 'sm:translate-x-0');
             }
         }
 
@@ -961,12 +1005,22 @@
 
         function getAppOrigin() {
             try {
-                // Use document.referrer to detect the main Streamlit application domain
+                // First priority: document.referrer (Streamlit app URL)
                 const ref = document.referrer;
-                if (ref && ref.includes('.streamlit.app')) {
-                    return new URL(ref).origin;
+                if (ref && (ref.includes('.streamlit.app') || ref.includes('localhost'))) {
+                    try {
+                        return new URL(ref).origin;
+                    } catch (e) { return ""; }
                 }
-                return window.location.origin;
+
+                // Second priority: window.top if accessible
+                try {
+                    if (window.top && window.top.location.origin) {
+                        return window.top.location.origin;
+                    }
+                } catch (e) { }
+
+                return "";
             } catch (e) {
                 return "";
             }
@@ -975,18 +1029,24 @@
         function updateNavLinks(role, branch) {
             const params = `&auth=true&role=${role}&branch=${encodeURIComponent(branch)}`;
             const origin = getAppOrigin();
+            const baseOrigin = origin ? origin.replace(/\/$/, '') : "";
 
             // Build absolute URLs for target="_top" navigation
-            const destDash = (origin || "") + "/Admin_Dashboard?page=Admin" + params;
-            const destIdx = (origin || "") + "/Sales_Registration?page=Index" + params;
-            const destLogout = (origin || "") + "/Admin_Dashboard?logout=true";
+            // For Streamlit, Dashboard is at root (/), Sales is at /Sales_Registration
+            const dashUrl = baseOrigin ? baseOrigin + "/?page=Admin" : "?page=Admin";
+            const idxUrl = baseOrigin ? baseOrigin + "/Sales_Registration?page=Index" : "?page=Index";
+            const logoutUrl = baseOrigin ? baseOrigin + "/?logout=true" : "?logout=true";
+
+            const destDash = dashUrl + (baseOrigin ? params.replace('&', '&') : params);
+            const destIdx = idxUrl + (baseOrigin ? params.replace('&', '&') : params);
+            const destLogout = logoutUrl;
 
             const navDash = document.getElementById('navDashboard');
             const navIdx = document.getElementById('navIndex');
             const navLogout = document.getElementById('navLogout');
 
-            navDash.href = destDash;
-            navIdx.href = destIdx;
+            if (navDash) navDash.href = destDash;
+            if (navIdx) navIdx.href = destIdx;
             if (navLogout) navLogout.href = destLogout;
 
             // Handle Dashboard click: Scroll to top if already on dashboard
@@ -1620,39 +1680,23 @@
 
         // Toast Notification System
         function showToast(message, type = 'success') {
-            const container = document.getElementById('toastWrapper');
-            if (!container) return;
-
+            const wrapper = document.getElementById('toastWrapper');
             const toast = document.createElement('div');
-            toast.className = `flex items-center gap-3 px-5 py-4 rounded-xl shadow-xl transform transition-all duration-300
-    translate-x-full ${type === 'success' ? 'bg-theme/20 border border-theme/30 text-theme-text' :
-                    type === 'error' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-500' :
-                        'bg-amber-500/20 border border-amber-500/30 text-amber-500'
-                }`;
+            const isError = type === 'error';
 
-            const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+            toast.className = `flex items-center gap-3 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in slide-in-from-right-10 duration-500
+                ${isError ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-theme/10 border-theme/20 text-theme'}`;
 
             toast.innerHTML = `
-    <span class="material-symbols-outlined shrink-0">${icon}</span>
-    <span class="text-sm font-bold flex-1">${message.replace(/\\n/g, '<br>')}</span>
-    <button onclick="this.parentElement.remove()" class="text-theme-muted hover:text-white transition-colors shrink-0">
-        <span class="material-symbols-outlined text-sm">close</span>
-    </button>
-    `;
+                <span class="material-symbols-outlined text-xl">${isError ? 'error' : 'check_circle'}</span>
+                <p class="text-sm font-bold tracking-tight">${message}</p>
+            `;
 
-            container.appendChild(toast);
-
-            // Animate in
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-full');
-            });
-
-            // Auto remove
+            wrapper.appendChild(toast);
             setTimeout(() => {
-                toast.classList.add('translate-x-full');
-                toast.classList.add('opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
+                toast.classList.add('opacity-0', 'translate-x-full', 'transition-all', 'duration-500');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
         }
     </script>
 </body>
