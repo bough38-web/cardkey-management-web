@@ -167,6 +167,9 @@
 </head>
 
 <body class="font-sans text-theme-text antialiased overflow-x-hidden" data-theme="dark">
+  <!-- Toast Notification Container -->
+  <div id="toastWrapper" class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 max-w-sm w-full"></div>
+
   <div class="min-h-screen flex flex-col">
     <!-- Decoration Header -->
     <header class="border-b border-theme-border bg-theme-bg/80 backdrop-blur-md sticky top-0 z-50">
@@ -657,8 +660,10 @@
         memo: document.getElementById('memo').value
       };
 
-      if (!data.serviceNo) {
-        alert("서비스번호를 입력해주세요.");
+      const svcInput = document.getElementById('serviceNo');
+      if (!svcInput.value.trim()) {
+        showToast("서비스번호를 입력해주세요.", 'error');
+        svcInput.focus();
         btn.disabled = false;
         btn.innerHTML = originalText;
         return;
@@ -668,20 +673,20 @@
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(msg => {
-            alert(msg);
+            showToast(msg, 'success');
             document.getElementById('salesForm').reset();
             btn.disabled = false;
             btn.innerHTML = originalText;
           })
           .withFailureHandler(err => {
-            alert("오류가 발생했습니다: " + err.message);
+            showToast("오류가 발생했습니다: " + err.message, 'error');
             btn.disabled = false;
             btn.innerHTML = originalText;
           })
           .processForm(data);
       } else {
         console.log("Local Preview Data:", data);
-        alert("등록 완료되었습니다. (로컬 미리보기)");
+        showToast("등록 완료되었습니다. (로컬 미리보기)", 'success');
         document.getElementById('salesForm').reset();
         btn.disabled = false;
         btn.innerHTML = originalText;
