@@ -1367,173 +1367,171 @@
                 alert("엑셀 다운로드가 요청되었습니다. (로컬 미리보기)");
             }
         }
-    </script>
 
-    // --- Super Admin Modal Logic ---
-    function openSuperAdminModal(action) {
-    const modal = document.getElementById('superAdminModal');
-    const title = document.getElementById('saModalTitle');
-    const actionType = document.getElementById('saActionType');
+        // --- Super Admin Modal Logic ---
+        function openSuperAdminModal(action) {
+            const modal = document.getElementById('superAdminModal');
+            const title = document.getElementById('saModalTitle');
+            const actionType = document.getElementById('saActionType');
 
-    // Groups
-    const userGroup = document.getElementById('saUserSelectGroup');
-    const nameGroup = document.getElementById('saNameGroup');
-    const branchGroup = document.getElementById('saBranchGroup');
-    const pwdGroup = document.getElementById('saPasswordGroup');
+            // Groups
+            const userGroup = document.getElementById('saUserSelectGroup');
+            const nameGroup = document.getElementById('saNameGroup');
+            const branchGroup = document.getElementById('saBranchGroup');
+            const pwdGroup = document.getElementById('saPasswordGroup');
 
-    // Reset Groups
-    userGroup.classList.add('hidden');
-    nameGroup.classList.add('hidden');
-    branchGroup.classList.add('hidden');
-    pwdGroup.classList.add('hidden');
+            // Reset Groups
+            userGroup.classList.add('hidden');
+            nameGroup.classList.add('hidden');
+            branchGroup.classList.add('hidden');
+            pwdGroup.classList.add('hidden');
 
-    actionType.value = action;
+            actionType.value = action;
 
-    if (action === 'reset') {
-    title.innerHTML = '패스워드 <span class="text-rose-500">초기화</span>';
-    userGroup.classList.remove('hidden');
-    pwdGroup.classList.remove('hidden');
-    } else if (action === 'register') {
-    title.innerHTML = '관리자 <span class="text-theme">등록</span>';
-    nameGroup.classList.remove('hidden');
-    branchGroup.classList.remove('hidden');
-    pwdGroup.classList.remove('hidden');
-    } else if (action === 'edit') {
-    title.innerHTML = '관리자 <span class="text-amber-500">수정</span>';
-    userGroup.classList.remove('hidden');
-    nameGroup.classList.remove('hidden');
-    branchGroup.classList.remove('hidden');
-    }
+            if (action === 'reset') {
+                title.innerHTML = '패스워드 <span class="text-rose-500">초기화</span>';
+                userGroup.classList.remove('hidden');
+                pwdGroup.classList.remove('hidden');
+            } else if (action === 'register') {
+                title.innerHTML = '관리자 <span class="text-theme">등록</span>';
+                nameGroup.classList.remove('hidden');
+                branchGroup.classList.remove('hidden');
+                pwdGroup.classList.remove('hidden');
+            } else if (action === 'edit') {
+                title.innerHTML = '관리자 <span class="text-amber-500">수정</span>';
+                userGroup.classList.remove('hidden');
+                nameGroup.classList.remove('hidden');
+                branchGroup.classList.remove('hidden');
+            }
 
-    modal.classList.remove('hidden');
-    }
+            modal.classList.remove('hidden');
+        }
 
-    function closeSuperAdminModal() {
-    document.getElementById('superAdminModal').classList.add('hidden');
-    document.getElementById('saForm').reset();
-    }
+        function closeSuperAdminModal() {
+            document.getElementById('superAdminModal').classList.add('hidden');
+            document.getElementById('saForm').reset();
+        }
 
-    document.getElementById('saForm').onsubmit = function(e) {
-    e.preventDefault();
-    const action = document.getElementById('saActionType').value;
-    showToast(`[슈퍼관리자 도구] ${action} 기능 적용이 완료되었습니다.<br><span class="text-xs opacity-70">실제 연동 전 프론트엔드 모의 작동 완료됨</span>`,
-    'success');
-    closeSuperAdminModal();
-    };
+        document.getElementById('saForm').onsubmit = function (e) {
+            e.preventDefault();
+            const action = document.getElementById('saActionType').value;
+            showToast(`[슈퍼관리자 도구] ${action} 기능 적용이 완료되었습니다.<br><span class="text-xs opacity-70">실제 연동 전 프론트엔드 모의 작동 완료됨</span>`,
+                'success');
+            closeSuperAdminModal();
+        };
 
-    // --- Worker Registration Logic ---
-    function openWorkerRegModal() {
-    const branch = document.getElementById('invBranch').value;
-    if (!branch) {
-    alert("지사를 먼저 선택해주세요!");
-    return;
-    }
-    document.getElementById('regWorkerBranch').value = branch;
-    document.getElementById('workerRegModal').classList.remove('hidden');
-    setWorkerRegTab('single');
-    }
+        // --- Worker Registration Logic ---
+        function openWorkerRegModal() {
+            const branch = document.getElementById('invBranch').value;
+            if (!branch) {
+                alert("지사를 먼저 선택해주세요!");
+                return;
+            }
+            document.getElementById('regWorkerBranch').value = branch;
+            document.getElementById('workerRegModal').classList.remove('hidden');
+            setWorkerRegTab('single');
+        }
 
-    function closeWorkerRegModal() {
-    document.getElementById('workerRegModal').classList.add('hidden');
-    document.getElementById('workerRegForm').reset();
-    }
+        function closeWorkerRegModal() {
+            document.getElementById('workerRegModal').classList.add('hidden');
+            document.getElementById('workerRegForm').reset();
+        }
 
-    function setWorkerRegTab(type) {
-    const tabSingle = document.getElementById('tabSingle');
-    const tabBatch = document.getElementById('tabBatch');
-    const groupSingle = document.getElementById('regSingleGroup');
-    const groupBatch = document.getElementById('regBatchGroup');
+        function setWorkerRegTab(type) {
+            const tabSingle = document.getElementById('tabSingle');
+            const tabBatch = document.getElementById('tabBatch');
+            const groupSingle = document.getElementById('regSingleGroup');
+            const groupBatch = document.getElementById('regBatchGroup');
 
-    document.getElementById('workerRegForm').dataset.mode = type;
+            document.getElementById('workerRegForm').dataset.mode = type;
 
-    if (type === 'single') {
-    tabSingle.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-theme text-white shadow-md transition-all';
-    tabBatch.className = 'flex-1 py-2 text-xs font-bold rounded-lg text-theme-muted hover:text-theme transition-all';
-    groupSingle.classList.remove('hidden');
-    groupBatch.classList.add('hidden');
-    } else {
-    tabSingle.className = 'flex-1 py-2 text-xs font-bold rounded-lg text-theme-muted hover:text-theme transition-all';
-    tabBatch.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-theme text-white shadow-md transition-all';
-    groupSingle.classList.add('hidden');
-    groupBatch.classList.remove('hidden');
-    }
-    }
+            if (type === 'single') {
+                tabSingle.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-theme text-white shadow-md transition-all';
+                tabBatch.className = 'flex-1 py-2 text-xs font-bold rounded-lg text-theme-muted hover:text-theme transition-all';
+                groupSingle.classList.remove('hidden');
+                groupBatch.classList.add('hidden');
+            } else {
+                tabSingle.className = 'flex-1 py-2 text-xs font-bold rounded-lg text-theme-muted hover:text-theme transition-all';
+                tabBatch.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-theme text-white shadow-md transition-all';
+                groupSingle.classList.add('hidden');
+                groupBatch.classList.remove('hidden');
+            }
+        }
 
-    document.getElementById('workerRegForm').onsubmit = function(e) {
-    e.preventDefault();
-    const mode = this.dataset.mode;
-    const branch = document.getElementById('regWorkerBranch').value;
+        document.getElementById('workerRegForm').onsubmit = function (e) {
+            e.preventDefault();
+            const mode = this.dataset.mode;
+            const branch = document.getElementById('regWorkerBranch').value;
 
-    let workers = [];
-    if (mode === 'single') {
-    const name = document.getElementById('regWorkerName').value.trim();
-    if(name) workers.push(name);
-    } else {
-    const text = document.getElementById('regWorkerBatchText').value;
-    workers = text.split(/[\\n,]+/).map(s => s.trim()).filter(s => s);
-    }
+            let workers = [];
+            if (mode === 'single') {
+                const name = document.getElementById('regWorkerName').value.trim();
+                if (name) workers.push(name);
+            } else {
+                const text = document.getElementById('regWorkerBatchText').value;
+                workers = text.split(/[\\n,]+/).map(s => s.trim()).filter(s => s);
+            }
 
-    if (workers.length === 0) {
-    showToast("등록할 사원 정보를 입력해주세요.", 'error');
-    return;
-    }
+            if (workers.length === 0) {
+                showToast("등록할 사원 정보를 입력해주세요.", 'error');
+                return;
+            }
 
-    if (typeof google !== 'undefined') {
-    const btn = this.querySelector('button[type="submit"]');
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> 처리중...';
-    btn.disabled = true;
+            if (typeof google !== 'undefined') {
+                const btn = this.querySelector('button[type="submit"]');
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> 처리중...';
+                btn.disabled = true;
 
-    // Mocking backend call for now since we don't have the apps script function yet
-    setTimeout(() => {
-    showToast(`${branch} 지사에 ${workers.length}명의 사원이 성공적으로 등록되었습니다.<br><span class="text-xs opacity-70">프론트엔드 모의 작동
+                // Mocking backend call for now since we don't have the apps script function yet
+                setTimeout(() => {
+                    showToast(`${branch} 지사에 ${workers.length}명의 사원이 성공적으로 등록되었습니다.<br><span class="text-xs opacity-70">프론트엔드 모의 작동
         완료</span>`, 'success');
 
-    // Add mock options to dropdown
-    const sel = document.getElementById('invWorker');
-    workers.forEach(w => {
-    let opt = document.createElement('option');
-    opt.value = w; opt.text = w;
-    opt.selected = true; // Select the last added worker
-    sel.appendChild(opt);
-    });
+                    // Add mock options to dropdown
+                    const sel = document.getElementById('invWorker');
+                    workers.forEach(w => {
+                        let opt = document.createElement('option');
+                        opt.value = w; opt.text = w;
+                        opt.selected = true; // Select the last added worker
+                        sel.appendChild(opt);
+                    });
 
-    closeWorkerRegModal();
-    btn.innerHTML = orig;
-    btn.disabled = false;
-    }, 800);
-    } else {
-    showToast(`[로컬 테스트 모드]<br>${branch} 지사에 ${workers.length}명의 사원이 등록되었습니다.<br><span class="text-[10px] opacity-70">목록:
+                    closeWorkerRegModal();
+                    btn.innerHTML = orig;
+                    btn.disabled = false;
+                }, 800);
+            } else {
+                showToast(`[로컬 테스트 모드]<br>${branch} 지사에 ${workers.length}명의 사원이 등록되었습니다.<br><span class="text-[10px] opacity-70">목록:
         ${workers.join(', ')}</span>`, 'success');
 
-    // Add to dropdown immediately for UX test
-    const sel = document.getElementById('invWorker');
-    workers.forEach(w => {
-    let opt = document.createElement('option');
-    opt.value = w; opt.text = w;
-    opt.selected = true;
-    sel.appendChild(opt);
-    });
-    closeWorkerRegModal();
-    }
-    };
+                // Add to dropdown immediately for UX test
+                const sel = document.getElementById('invWorker');
+                workers.forEach(w => {
+                    let opt = document.createElement('option');
+                    opt.value = w; opt.text = w;
+                    opt.selected = true;
+                    sel.appendChild(opt);
+                });
+                closeWorkerRegModal();
+            }
+        };
 
-    // Toast Notification System
-    function showToast(message, type = 'success') {
-    const container = document.getElementById('toastWrapper');
-    if (!container) return;
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastWrapper');
+            if (!container) return;
 
-    const toast = document.createElement('div');
-    toast.className = `flex items-center gap-3 px-5 py-4 rounded-xl shadow-xl transform transition-all duration-300
-    translate-x-full ${
-    type === 'success' ? 'bg-theme/20 border border-theme/30 text-theme-text' :
-    type === 'error' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-500' :
-    'bg-amber-500/20 border border-amber-500/30 text-amber-500'
-    }`;
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 px-5 py-4 rounded-xl shadow-xl transform transition-all duration-300
+    translate-x-full ${type === 'success' ? 'bg-theme/20 border border-theme/30 text-theme-text' :
+                    type === 'error' ? 'bg-rose-500/20 border border-rose-500/30 text-rose-500' :
+                        'bg-amber-500/20 border border-amber-500/30 text-amber-500'
+                }`;
 
-    const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+            const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
 
-    toast.innerHTML = `
+            toast.innerHTML = `
     <span class="material-symbols-outlined shrink-0">${icon}</span>
     <span class="text-sm font-bold flex-1">${message.replace(/\\n/g, '<br>')}</span>
     <button onclick="this.parentElement.remove()" class="text-theme-muted hover:text-white transition-colors shrink-0">
@@ -1541,21 +1539,21 @@
     </button>
     `;
 
-    container.appendChild(toast);
+            container.appendChild(toast);
 
-    // Animate in
-    requestAnimationFrame(() => {
-    toast.classList.remove('translate-x-full');
-    });
+            // Animate in
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-full');
+            });
 
-    // Auto remove
-    setTimeout(() => {
-    toast.classList.add('translate-x-full');
-    toast.classList.add('opacity-0');
-    setTimeout(() => toast.remove(), 300);
-    }, 4000);
-    }
-
+            // Auto remove
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
 </body>
 
 </html>
