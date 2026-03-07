@@ -572,6 +572,18 @@
     }
 
     // Initial setup
+    function getAppOrigin() {
+      try {
+        const ref = document.referrer;
+        if (ref && ref.includes('.streamlit.app')) {
+          return new URL(ref).origin;
+        }
+        return window.location.origin;
+      } catch (e) {
+        return "";
+      }
+    }
+
     window.onload = function () {
       const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
       setTheme(savedTheme);
@@ -583,8 +595,10 @@
 
       // Update Navigation Links
       const params = `&auth=true&role=${userRole}${userBranch ? '&branch=' + encodeURIComponent(userBranch) : ''}`;
-      document.getElementById('navDashboard').href = BASE_URL ? `${BASE_URL}?page=Admin${params}` : `/Admin_Dashboard?page=Admin${params}`;
-      document.getElementById('navLogout').href = BASE_URL ? `${BASE_URL}?logout=true` : `Login.html?logout=true`;
+      const origin = getAppOrigin();
+
+      document.getElementById('navDashboard').href = (origin || "") + "/Admin_Dashboard?page=Admin" + params;
+      document.getElementById('navLogout').href = (origin || "") + "/Admin_Dashboard?logout=true"; // Assume logout via dashboard or root
 
       if (userBranch && userBranch !== 'HQ') {
         document.getElementById('branch').value = userBranch;

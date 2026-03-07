@@ -122,8 +122,7 @@
                 </div>
             </div>
             <nav class="flex-1 px-4 space-y-2">
-                <a id="navDashboard" href="#"
-                    onclick="document.querySelector('main').scrollTo({top: 0, behavior: 'smooth'}); return false;"
+                <a id="navDashboard" href="#" target="_top"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl bg-theme/10 text-theme border border-theme/20 font-bold transition-all no-underline">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span>대시보드</span>
@@ -960,35 +959,40 @@
             updateNavLinks(currentRole, currentBranch);
         }
 
+        function getAppOrigin() {
+            try {
+                // Use document.referrer to detect the main Streamlit application domain
+                const ref = document.referrer;
+                if (ref && ref.includes('.streamlit.app')) {
+                    return new URL(ref).origin;
+                }
+                return window.location.origin;
+            } catch (e) {
+                return "";
+            }
+        }
+
         function updateNavLinks(role, branch) {
             const params = `&auth=true&role=${role}&branch=${encodeURIComponent(branch)}`;
+            const origin = getAppOrigin();
 
-            // Streamlit Integration: Use window.top.location.href for reliable cross-iframe navigation
-            // Using relative paths to the Streamlit page names
-            const destDash = "/Admin_Dashboard?page=Admin" + params;
-            const destIdx = "/Sales_Registration?page=Index" + params;
+            // Build absolute URLs for target="_top" navigation
+            const destDash = (origin || "") + "/Admin_Dashboard?page=Admin" + params;
+            const destIdx = (origin || "") + "/Sales_Registration?page=Index" + params;
 
             const navDash = document.getElementById('navDashboard');
             const navIdx = document.getElementById('navIndex');
 
-            navDash.onclick = (e) => {
-                e.preventDefault();
-                // Scroll to top if already on dashboard, else navigate
-                if (window.top.location.pathname.includes('Admin_Dashboard')) {
-                    document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    window.top.location.href = destDash;
-                }
-            };
-
-            navIdx.onclick = (e) => {
-                e.preventDefault();
-                window.top.location.href = destIdx;
-            };
-
-            // Set href for accessibility
             navDash.href = destDash;
             navIdx.href = destIdx;
+
+            // Handle Dashboard click: Scroll to top if already on dashboard
+            navDash.onclick = (e) => {
+                if (window.location.search.includes('page=Admin')) {
+                    e.preventDefault();
+                    document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
         }
 
         // Global declarations moved to top
