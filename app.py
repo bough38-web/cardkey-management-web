@@ -2,13 +2,31 @@ import streamlit as st
 
 st.set_page_config(layout="wide", page_title="KeyGuard Gateway")
 
-st.title("KeyGuard Web Management Portal")
 st.markdown("""
-### 접속할 시스템을 선택하세요
-이 포털에서는 두 가지 시스템으로 접근이 가능합니다. 이 페이지의 URL을 기준으로 끝에 페이지 이름을 붙여 직접 접속할 수도 있습니다.
+# 🛡️ KeyGuard Enterprise
 
-* **[판매 등록 (현장용) ➡️](Sales_Registration)** : 각 지사에서 카드키 판매를 등록하는 시스템입니다.
-* **[관리자 대시보드 (본사용) ➡️](Admin_Dashboard)** : 전체 지사의 판매 현황과 재고를 파악하는 최고관리자용 시스템입니다.
-
-좌측 사이드바(Sidebar) 메뉴를 통해서도 원하시는 페이지로 즉각 이동할 수 있습니다.
+환영합니다. **카드키 통합 관리 포털**입니다.
+아래 메뉴를 선택하여 이동해 주세요.
+---
 """)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("""
+    ### 🏢 지사별 판매 현황 등록
+    각 지점별로 판매된 카드키의 내역을 스캔하고 데이터화합니다.
+    
+    [👉 판매 등록 페이지로 이동](Sales_Registration)
+    """)
+
+with col2:
+    st.markdown("""
+    ### 👑 최고 관리자 대시보드
+    전국 지점의 남은 재고와 전체 판매 실적을 실시간으로 확인합니다.
+    
+    [👉 대시보드 페이지로 이동](Admin_Dashboard)
+    """)
+
+st.markdown("---")
+st.info("💡 **Tip:** 좌측 상단의 화살표(`>`) 모양을 클릭하여 열리는 사이드바 메뉴를 통해서도 언제든지 원하시는 페이지로 이동하실 수 있습니다.")

@@ -578,7 +578,7 @@
 
       // Update Navigation Links
       const params = `&auth=true&role=${userRole}${userBranch ? '&branch=' + encodeURIComponent(userBranch) : ''}`;
-      document.getElementById('navDashboard').href = BASE_URL ? `${BASE_URL}?page=Admin${params}` : `Admin.html?page=Admin${params}`;
+      document.getElementById('navDashboard').href = BASE_URL ? `${BASE_URL}?page=Admin${params}` : `Admin_Dashboard?page=Admin${params}`;
       document.getElementById('navLogout').href = BASE_URL ? `${BASE_URL}?logout=true` : `Login.html?logout=true`;
 
       if (userBranch && userBranch !== 'HQ') {
