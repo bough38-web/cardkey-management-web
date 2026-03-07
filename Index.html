@@ -100,6 +100,55 @@
       background: var(--theme-card);
       backdrop-filter: blur(20px);
       border: 1px solid var(--theme-border);
+      box-shadow: var(--theme-shadow);
+    }
+
+    /* Mobile-first Spacing Refinements */
+    @media (max-width: 640px) {
+      .glass-card {
+        border-radius: 1.25rem !important;
+      }
+
+      .p-10 {
+        padding: 1.5rem !important;
+      }
+
+      .lg\:p-14 {
+        padding: 1.5rem !important;
+      }
+
+      .mb-14 {
+        margin-bottom: 2rem !important;
+      }
+
+      .px-8 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+      }
+
+      .py-16 {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+      }
+
+      .gap-x-14 {
+        column-gap: 1rem !important;
+      }
+
+      .gap-y-10 {
+        row-gap: 1.25rem !important;
+      }
+
+      .space-y-12> :not([hidden])~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: 1.75rem !important;
+        margin-bottom: 0px !important;
+      }
+
+      h1.text-4xl {
+        font-size: 1.875rem !important;
+        line-height: 2.25rem !important;
+      }
     }
 
     .glass-input {
@@ -289,7 +338,7 @@
               <!-- Horizontal Form Row: Branch & Worker -->
               <div class="grid grid-cols-1 gap-x-14 gap-y-10 md:grid-cols-2">
                 <div class="flex flex-col gap-3">
-                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">지사</label>
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">지사 (Branch)</label>
                   <div class="relative group">
                     <select id="branch" onchange="updateWorkers()"
                       class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium focus:ring-0 appearance-none">
@@ -308,8 +357,7 @@
                   </div>
                 </div>
                 <div class="flex flex-col gap-3">
-                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">사원명 (Worker
-                    selection)</label>
+                  <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">사원명 (Worker)</label>
                   <div class="relative group">
                     <select id="worker"
                       class="glass-input h-14 w-full rounded-2xl px-5 text-sm font-medium focus:ring-0 appearance-none">
@@ -319,6 +367,23 @@
                       class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">person_search</span>
                   </div>
                 </div>
+              </div>
+
+              <!-- Sale Type Selection (Paid/Free) -->
+              <div class="flex flex-col gap-3">
+                <label class="text-xs font-bold uppercase tracking-widest text-theme-muted ml-1">판매 구분 (Sale
+                  Type)</label>
+                <div class="grid grid-cols-2 gap-4">
+                  <button type="button" onclick="setSaleType('paid', event)" id="btnPaid"
+                    class="h-14 rounded-2xl border-2 border-theme bg-theme/10 text-theme font-bold flex items-center justify-center gap-2 transition-all scale-[1.02] shadow-theme-glow">
+                    <span class="material-symbols-outlined">payments</span> 유상판매
+                  </button>
+                  <button type="button" onclick="setSaleType('free', event)" id="btnFree"
+                    class="h-14 rounded-2xl border-2 border-theme-border bg-theme-input text-theme-muted font-bold flex items-center justify-center gap-2 transition-all">
+                    <span class="material-symbols-outlined">redeem</span> 무료판매
+                  </button>
+                </div>
+                <input type="hidden" id="saleType" value="paid">
               </div>
 
               <!-- Service Number Row with Icon -->
@@ -648,9 +713,33 @@
       }
     }
 
+    let currentSaleType = 'paid';
+
+    function setSaleType(type, e) {
+      if (e) e.preventDefault();
+      currentSaleType = type;
+      document.getElementById('saleType').value = type;
+
+      const btnPaid = document.getElementById('btnPaid');
+      const btnFree = document.getElementById('btnFree');
+      const priceInput = document.getElementById('price');
+
+      if (type === 'paid') {
+        btnPaid.className = "h-14 rounded-2xl border-2 border-theme bg-theme/10 text-theme font-bold flex items-center justify-center gap-2 transition-all scale-[1.02] shadow-theme-glow";
+        btnFree.className = "h-14 rounded-2xl border-2 border-theme-border bg-theme-input text-theme-muted font-bold flex items-center justify-center gap-2 transition-all";
+        priceInput.value = "3,000";
+      } else {
+        btnPaid.className = "h-14 rounded-2xl border-2 border-theme-border bg-theme-input text-theme-muted font-bold flex items-center justify-center gap-2 transition-all";
+        btnFree.className = "h-14 rounded-2xl border-2 border-theme bg-theme/10 text-theme font-bold flex items-center justify-center gap-2 transition-all scale-[1.02] shadow-theme-glow";
+        priceInput.value = "0";
+      }
+      calculateTotal();
+    }
+
     function calculateTotal() {
       const qty = parseInt(document.getElementById('qty').value) || 0;
-      const total = qty * 3000;
+      const unitPrice = currentSaleType === 'paid' ? 3000 : 0;
+      const total = qty * unitPrice;
       document.getElementById('total').value = total.toLocaleString();
     }
 
@@ -668,6 +757,7 @@
         type1: document.getElementById('type1').value,
         type2: document.getElementById('type2').value,
         qty: document.getElementById('qty').value,
+        saleType: document.getElementById('saleType').value,
         memo: document.getElementById('memo').value
       };
 
@@ -684,8 +774,9 @@
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run
           .withSuccessHandler(msg => {
-            showToast(msg, 'success');
+            showToast("✅ 저장 완료되었습니다.", 'success');
             document.getElementById('salesForm').reset();
+            setSaleType('paid'); // Reset sale type to default
             btn.disabled = false;
             btn.innerHTML = originalText;
           })
