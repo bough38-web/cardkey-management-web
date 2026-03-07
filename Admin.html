@@ -122,7 +122,8 @@
                 </div>
             </div>
             <nav class="flex-1 px-4 space-y-2">
-                <a id="navDashboard" href="#" target="_top"
+                <a id="navDashboard" href="#"
+                    onclick="document.querySelector('main').scrollTo({top: 0, behavior: 'smooth'}); return false;"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl bg-theme/10 text-theme border border-theme/20 font-bold transition-all no-underline">
                     <span class="material-symbols-outlined">dashboard</span>
                     <span>대시보드</span>
@@ -148,7 +149,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto scrollbar-hide relative bg-theme-bg">
+        <main class="flex-1 overflow-y-auto relative bg-theme-bg">
             <!-- Decorative Blobs -->
             <div class="absolute top-1/4 right-0 w-96 h-96 bg-theme/5 rounded-full blur-[120px] pointer-events-none">
             </div>
@@ -496,15 +497,21 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <div class="glass-panel p-8 rounded-[2.5rem] shadow-premium">
                             <div class="flex items-center justify-between mb-8">
-                                <div>
-                                    <h3 class="text-lg font-extrabold text-theme-text tracking-tight">지사별 보관고</h3>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="text-lg font-extrabold text-theme-text tracking-tight">지사별 보관고</h3>
+                                        <button
+                                            onclick="document.querySelector('main').scrollTo({top: 0, behavior: 'smooth'})"
+                                            class="text-[10px] font-bold text-theme-muted hover:text-theme flex items-center gap-1 uppercase tracking-widest transition-all">
+                                            <span class="material-symbols-outlined text-xs">arrow_upward</span> 최상단으로
+                                        </button>
+                                    </div>
                                     <p class="text-theme-muted text-[10px] font-bold uppercase tracking-widest">본무 -> 지사
                                         불출 전 잔여분</p>
                                 </div>
                                 <button onclick="openInventoryModal('Branch')"
-                                    class="flex items-center gap-2 text-theme text-[10px] font-black uppercase tracking-widest hover:underline">
-                                    <span class="material-symbols-outlined text-sm">add_box</span>
-                                    본사 입고 등록
+                                    class="flex items-center gap-2 text-theme text-[10px] font-black uppercase tracking-widest hover:underline ml-6">
+                                    <span class="material-symbols-outlined text-sm">add_box</span> 본사 입고 등록
                                 </button>
                             </div>
                             <div id="branchStockGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -514,15 +521,21 @@
 
                         <div class="glass-panel p-8 rounded-[2.5rem] shadow-premium border-theme/20">
                             <div class="flex items-center justify-between mb-8">
-                                <div>
-                                    <h3 class="text-lg font-extrabold text-theme-text tracking-tight">사원별 불출대장</h3>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="text-lg font-extrabold text-theme-text tracking-tight">사원별 불출대장</h3>
+                                        <button
+                                            onclick="document.querySelector('main').scrollTo({top: 0, behavior: 'smooth'})"
+                                            class="text-[10px] font-bold text-theme-muted hover:text-theme flex items-center gap-1 uppercase tracking-widest transition-all">
+                                            <span class="material-symbols-outlined text-xs">arrow_upward</span> 최상단으로
+                                        </button>
+                                    </div>
                                     <p class="text-theme-muted text-[10px] font-bold uppercase tracking-widest">지사 -> 사원
                                         불출량 - 실제 판매량</p>
                                 </div>
                                 <button onclick="openInventoryModal('Worker')"
-                                    class="flex items-center gap-2 text-amber-500 text-[10px] font-black uppercase tracking-widest hover:underline">
-                                    <span class="material-symbols-outlined text-sm">assignment_return</span>
-                                    현장 불출 등록
+                                    class="flex items-center gap-2 text-amber-500 text-[10px] font-black uppercase tracking-widest hover:underline ml-6">
+                                    <span class="material-symbols-outlined text-sm">assignment_return</span> 현장 불출 등록
                                 </button>
                             </div>
                             <div id="workerStockGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -950,14 +963,32 @@
         function updateNavLinks(role, branch) {
             const params = `&auth=true&role=${role}&branch=${encodeURIComponent(branch)}`;
 
-            // Streamlit Integration: Prefer relative paths to stay within the Streamlit app
-            // If BASE_URL exists and we are not in top-level Streamlit, we might need a full URL, 
-            // but for streamlit.app, relative paths usually work better for navigating between pages.
+            // Streamlit Integration: Use window.top.location.href for reliable cross-iframe navigation
+            // Using relative paths to the Streamlit page names
             const destDash = "/Admin_Dashboard?page=Admin" + params;
             const destIdx = "/Sales_Registration?page=Index" + params;
 
-            document.getElementById('navDashboard').href = destDash;
-            document.getElementById('navIndex').href = destIdx;
+            const navDash = document.getElementById('navDashboard');
+            const navIdx = document.getElementById('navIndex');
+
+            navDash.onclick = (e) => {
+                e.preventDefault();
+                // Scroll to top if already on dashboard, else navigate
+                if (window.top.location.pathname.includes('Admin_Dashboard')) {
+                    document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    window.top.location.href = destDash;
+                }
+            };
+
+            navIdx.onclick = (e) => {
+                e.preventDefault();
+                window.top.location.href = destIdx;
+            };
+
+            // Set href for accessibility
+            navDash.href = destDash;
+            navIdx.href = destIdx;
         }
 
         // Global declarations moved to top
