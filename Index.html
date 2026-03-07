@@ -641,9 +641,26 @@
         input.select();
       }
       calculateTotal();
+    } function showToast(message, type = 'success') {
+      const wrapper = document.getElementById('toastWrapper');
+      if (!wrapper) return;
+      const toast = document.createElement('div');
+      const isError = type === 'error';
+
+      toast.className = `flex items-center gap-3 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl animate-in slide-in-from-right-10 duration-500
+                ${isError ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-theme/10 border-theme/20 text-theme'}`;
+
+      toast.innerHTML = `
+                <span class="material-symbols-outlined text-xl">${isError ? 'error' : 'check_circle'}</span>
+                <p class="text-sm font-bold tracking-tight">${message}</p>
+            `;
+
+      wrapper.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-x-full', 'transition-all', 'duration-500');
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
     }
-
-
 
     // Initial setup
     function getAppOrigin() {
