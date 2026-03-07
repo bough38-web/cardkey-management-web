@@ -11,6 +11,7 @@ def load_html(file_name):
 html_content = load_html("Index.html")
 # Inject a little style to hide Streamlit's default padding to make the HTML look native
 st.markdown("""
+<div style="display:none;">
     <style>
         .block-container {
             padding-top: 0rem !important;
@@ -21,6 +22,7 @@ st.markdown("""
         }
         header {visibility: hidden;}
     </style>
+</div>
 """, unsafe_allow_html=True)
 
 st.components.v1.html(html_content, height=1200, scrolling=True)
