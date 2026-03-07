@@ -962,8 +962,8 @@
 
         function updateNavLinks(role, branch) {
             const params = `&auth=true&role=${role}&branch=${encodeURIComponent(branch)}`;
-            const destDash = BASE_URL ? `${BASE_URL}?page=Admin${params}` : `Admin_Dashboard?page=Admin${params}`;
-            const destIdx = BASE_URL ? `${BASE_URL}?page=Index${params}` : `Sales_Registration?page=Index${params}`;
+            const destDash = BASE_URL ? `${BASE_URL}?page=Admin${params}` : `/Admin_Dashboard?page=Admin${params}`;
+            const destIdx = BASE_URL ? `${BASE_URL}?page=Index${params}` : `/Sales_Registration?page=Index${params}`;
             document.getElementById('navDashboard').href = destDash;
             document.getElementById('navIndex').href = destIdx;
         }
