@@ -608,7 +608,7 @@
     function setTheme(themeName) {
       document.body.setAttribute('data-theme', themeName);
       localStorage.setItem('selectedTheme', themeName);
-      console.log('Theme changed to:', themeName);
+
     }
 
     // Formatting and UI helpers
@@ -711,11 +711,9 @@
 
       if (navDash) {
         navDash.href = dashUrl;
-        console.log('Navigation - Dashboard URL set to:', dashUrl);
       }
       if (navLogout) {
         navLogout.href = logoutUrl;
-        console.log('Navigation - Logout URL set to:', logoutUrl);
       }
 
       if (userBranch && userBranch !== 'HQ') {
@@ -806,7 +804,6 @@
       const btn = document.getElementById('saveBtn') || document.querySelector('#salesForm button[type="submit"]');
       const originalText = btn.innerHTML;
       btn.disabled = true;
-      console.log('Submission started...');
 
       const branch = document.getElementById('branch');
       const worker = document.getElementById('worker');
@@ -860,34 +857,28 @@
 
       // 구글 앱스 스크립트 환경 대응
       // Set a fallback timeout to reset the button after 15 seconds if no response
-      console.log('Setting 15s processing timeout...');
       const processingTimeout = setTimeout(() => {
         btn.disabled = false;
         btn.innerHTML = originalText;
         showToast('서버 응답이 지연되어 처리 중 상태를 해제했습니다.', 'error');
-        console.warn('Processing timeout triggered!');
       }, 15000);
 
       if (typeof google !== 'undefined' && google.script && google.script.run) {
-        console.log('Calling google.script.run.processForm...');
         google.script.run
           .withSuccessHandler(msg => {
             try {
-              console.log('Success response received from server');
               showToast("✅ 저장 완료되었습니다.", 'success');
               document.getElementById('salesForm').reset();
               setSaleType('paid'); // Reset sale type to default
             } catch (err) {
               console.error("Success handler error:", err);
             } finally {
-              console.log('Cleaning up processing state (Success)');
               clearTimeout(processingTimeout);
               btn.disabled = false;
               btn.innerHTML = originalText;
             }
           })
           .withFailureHandler(err => {
-            console.error('Google Apps Script failure:', err);
             showToast("오류가 발생했습니다: " + err.message, 'error');
             clearTimeout(processingTimeout);
             btn.disabled = false;
@@ -895,9 +886,7 @@
           })
           .processForm(data);
       } else {
-        console.log("Local Preview Data:", data);
         setTimeout(() => {
-          console.log('Completing local preview submission');
           showToast("등록 완료되었습니다. (로컬 미리보기)", 'success');
           document.getElementById('salesForm').reset();
           clearTimeout(processingTimeout);

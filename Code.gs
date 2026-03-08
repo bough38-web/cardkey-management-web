@@ -474,3 +474,39 @@ function updateAdminInfo(data) {
     return { success: false, message: "수정 중 오류 발생: " + e.message };
   }
 }
+
+/**
+ * 시스템 초기화 (모든 데이터 삭제 - 주의!!)
+ * 판매내역, 재고내역, 불출내역을 모두 비우고 헤더만 남깁니다.
+ * 사원정보와 관리자정보는 기본값으로 복구합니다.
+ */
+function initializeSystem() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheetsToClear = ['판매내역', '재고내역', '불출내역', '업로드용_결과'];
+  
+  sheetsToClear.forEach(name => {
+    const sheet = ss.getSheetByName(name);
+    if (sheet) {
+      if (sheet.getLastRow() > 1) {
+        sheet.deleteRows(2, sheet.getLastRow() - 1);
+      }
+    }
+  });
+
+  // 사원정보 초기화 (예시 데이터만 남기거나 비우기)
+  const workerSheet = ss.getSheetByName('사원정보');
+  if (workerSheet && workerSheet.getLastRow() > 1) {
+    workerSheet.deleteRows(2, workerSheet.getLastRow() - 1);
+    workerSheet.appendRow(['중앙', '홍길동']); // 기본 예시
+  }
+
+  // 관리자정보 초기화 (기본 admin 계정만 남기기)
+  const adminSheet = ss.getSheetByName('관리자정보');
+  if (adminSheet) {
+    adminSheet.clear();
+    adminSheet.appendRow(['사용자ID', '성명', '비밀번호', '권한', '지사']);
+    adminSheet.appendRow(['admin', '최고관리자', 'admin1234', 'Admin', 'HQ']);
+  }
+
+  return "시스템의 모든 데이터가 초기화되었습니다.";
+}
