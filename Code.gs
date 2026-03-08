@@ -477,50 +477,91 @@ function updateAdminInfo(data) {
 
 /**
  * 시스템 초기화 (데이터 삭제)
- * @param {string} branchFilter - 특정 지사만 리셋할 경우 지사명, 전체 리셋은 빈값 또는 'ALL'
- * 판매내역, 재고내역, 불출내역을 필터링하여 삭제합니다.
+ * @param {string} branchFilter - 'ALL' = 전체, 또는 특정 지사명 (예: '중앙')
+ * @param {string} dataType - 'ALL' = 전체, 'SALES' = 판매실적만, 'INVENTORY' = 재고만, 'ISSUANCE' = 불출만
  */
-function initializeSystem(branchFilter) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetsToClear = ['판매내역', '재고내역', '불출내역'];
-  const isGlobalReset = !branchFilter || branchFilter === 'ALL' || branchFilter === 'HQ';
-  
-  sheetsToClear.forEach(name => {
-    const sheet = ss.getSheetByName(name);
-    if (!sheet) return;
+function initializeSystem(branchFilter, dataType) {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const isGlobalBranch = !branchFilter || branchFilter === 'ALL';
+    const isGlobalType = !dataType || dataType === 'ALL';
     
-    if (isGlobalReset) {
-      if (sheet.getLastRow() > 1) {
-        sheet.deleteRows(2, sheet.getLastRow() - 1);
-      }
+    // 데이터 유형별 시트 매핑
+    const sheetMap = {
+      'SALES': '판매내역',
+      'INVENTORY': '재고내역',
+      'ISSUANCE': '불출내역'
+    };
+    
+    // 삭제할 시트 목록 결정
+    let sheetsToProcess = [];
+    if (isGlobalType) {
+      sheetsToProcess = ['판매내역', '재고내역', '불출내역'];
     } else {
-      // 특정 지사만 삭제
-      const data = sheet.getDataRange().getValues();
-      // 역순으로 돌아야 삭제 시 인덱스가 꼬이지 않음
-      for (let i = data.length - 1; i >= 1; i--) {
-        if (data[i][1] === branchFilter) { // B열이 지사명임 (판매, 재고, 불출 공통)
-          sheet.deleteRow(i + 1);
+      const targetSheet = sheetMap[dataType];
+      if (targetSheet) {
+        sheetsToProcess = [targetSheet];
+      }
+    }
+    
+    let deletedCount = 0;
+    
+    sheetsToProcess.forEach(name => {
+      const sheet = ss.getSheetByName(name);
+      if (!sheet || sheet.getLastRow() <= 1) return;
+      
+      if (isGlobalBranch) {
+        // 전체 지사 삭제 — 헤더만 남기고 모두 삭제
+        const rowsToDelete = sheet.getLastRow() - 1;
+        if (rowsToDelete > 0) {
+          sheet.deleteRows(2, rowsToDelete);
+          deletedCount += rowsToDelete;
+        }
+      } else {
+        // 특정 지사만 삭제 — B열(지사명) 기준으로 역순 삭제
+        const data = sheet.getDataRange().getValues();
+        for (let i = data.length - 1; i >= 1; i--) {
+          if (String(data[i][1]).trim() === String(branchFilter).trim()) {
+            sheet.deleteRow(i + 1);
+            deletedCount++;
+          }
         }
       }
+    });
+    
+    // 전체 초기화 + 전체 데이터 유형일 때만 관리자/사원 정보 리셋
+    if (isGlobalBranch && isGlobalType) {
+      const workerSheet = ss.getSheetByName('사원정보');
+      if (workerSheet && workerSheet.getLastRow() > 1) {
+        workerSheet.deleteRows(2, workerSheet.getLastRow() - 1);
+        workerSheet.appendRow(['중앙', '홍길동']);
+      }
+      
+      const adminSheet = ss.getSheetByName('관리자정보');
+      if (adminSheet) {
+        adminSheet.clear();
+        adminSheet.appendRow(['사용자ID', '성명', '비밀번호', '권한', '지사']);
+        adminSheet.appendRow(['admin', '최고관리자', 'admin1234', 'Admin', 'HQ']);
+      }
+      
+      // 업로드 결과 시트도 리셋
+      const resultSheet = ss.getSheetByName('업로드용_결과');
+      if (resultSheet && resultSheet.getLastRow() > 1) {
+        resultSheet.deleteRows(2, resultSheet.getLastRow() - 1);
+      }
     }
-  });
-
-  if (isGlobalReset) {
-    // 사원정보 및 관리자 정보는 전체 리셋시에만 기본값 복구
-    const workerSheet = ss.getSheetByName('사원정보');
-    if (workerSheet && workerSheet.getLastRow() > 1) {
-      workerSheet.deleteRows(2, workerSheet.getLastRow() - 1);
-      workerSheet.appendRow(['중앙', '홍길동']);
-    }
-
-    const adminSheet = ss.getSheetByName('관리자정보');
-    if (adminSheet) {
-      adminSheet.clear();
-      adminSheet.appendRow(['사용자ID', '성명', '비밀번호', '권한', '지사']);
-      adminSheet.appendRow(['admin', '최고관리자', 'admin1234', 'Admin', 'HQ']);
-    }
-    return "시스템의 모든 데이터가 초기화되었습니다.";
-  } else {
-    return branchFilter + " 지사의 데이터가 초기화되었습니다.";
+    
+    // 결과 메시지 생성
+    const typeLabel = isGlobalType ? '전체' : (
+      dataType === 'SALES' ? '판매실적' : 
+      dataType === 'INVENTORY' ? '재고' : 
+      dataType === 'ISSUANCE' ? '불출' : dataType
+    );
+    const branchLabel = isGlobalBranch ? '전체 지사' : branchFilter + ' 지사';
+    
+    return `✅ ${branchLabel}의 ${typeLabel} 데이터가 초기화되었습니다. (${deletedCount}건 삭제)`;
+    
+  } catch (e) {
+    return '❌ 초기화 중 오류 발생: ' + e.message;
   }
 }

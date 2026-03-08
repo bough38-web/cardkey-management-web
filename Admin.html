@@ -884,7 +884,7 @@
             <div class="flex items-center justify-between mb-8">
                 <h3 class="text-xl font-black text-rose-500 tracking-tight uppercase flex items-center gap-3">
                     <span class="material-symbols-outlined text-3xl">warning</span>
-                    System Reset
+                    데이터 초기화
                 </h3>
                 <button onclick="closeResetModal()" class="text-theme-muted hover:text-white transition-colors">
                     <span class="material-symbols-outlined text-3xl">close</span>
@@ -892,17 +892,33 @@
             </div>
             <div class="space-y-6">
                 <p class="text-[11px] font-bold text-theme-muted leading-relaxed">
-                    시스템의 데이터를 초기화합니다. 특정 지사만 선택하거나 전체 데이터를 삭제할 수 있습니다. <br>
-                    <span class="text-rose-500 italic">* 이 작업은 되돌릴 수 없으니 신중히 결정해주세요.</span>
+                    특정 지사 또는 전체 데이터를 유형별로 선택하여 초기화할 수 있습니다.<br>
+                    <span class="text-rose-500 italic">⚠️ 이 작업은 되돌릴 수 없으니 신중히 결정해주세요.</span>
                 </p>
 
+                <!-- 데이터 유형 선택 -->
                 <div>
-                    <label class="block text-[10px] font-black text-theme uppercase tracking-widest mb-3">초기화 대상 (지사
-                        선택)</label>
+                    <label class="block text-[10px] font-black text-theme uppercase tracking-widest mb-3">초기화 유형</label>
+                    <div class="relative">
+                        <select id="resetDataTypeSelect"
+                            class="w-full bg-theme-input border border-theme-border rounded-2xl px-5 py-4 text-theme-text outline-none focus:border-rose-500/50 transition-all font-bold appearance-none">
+                            <option value="ALL">판매+재고+불출 전체 초기화</option>
+                            <option value="SALES">판매실적만 초기화</option>
+                            <option value="INVENTORY">재고만 초기화</option>
+                            <option value="ISSUANCE">불출만 초기화</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+
+                <!-- 지사 선택 -->
+                <div>
+                    <label class="block text-[10px] font-black text-theme uppercase tracking-widest mb-3">대상 지사</label>
                     <div class="relative">
                         <select id="resetBranchSelect"
                             class="w-full bg-theme-input border border-theme-border rounded-2xl px-5 py-4 text-theme-text outline-none focus:border-rose-500/50 transition-all font-bold appearance-none">
-                            <option value="ALL">전체 데이터 초기화 (All)</option>
+                            <option value="ALL">전체 지사</option>
                             <option value="중앙">중앙</option>
                             <option value="강북">강북</option>
                             <option value="서대문">서대문</option>
@@ -917,6 +933,7 @@
                     </div>
                 </div>
 
+                <!-- 동의 체크 -->
                 <div class="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/20">
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <input type="checkbox" id="resetConfirmCheck"
@@ -927,10 +944,12 @@
                     </label>
                 </div>
 
-                <div class="pt-4">
+                <!-- 실행 버튼 -->
+                <div class="pt-2">
                     <button onclick="handleSystemReset()" id="resetExecuteBtn"
-                        class="w-full bg-rose-600 text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-xl shadow-rose-900/20 hover:bg-rose-500 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                        Execute Destructive Reset
+                        class="w-full bg-rose-600 text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-xl shadow-rose-900/20 hover:bg-rose-500 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-lg">delete_forever</span>
+                        초기화 실행
                     </button>
                 </div>
             </div>
@@ -1225,6 +1244,8 @@
         function openResetModal() {
             document.getElementById('resetModal').classList.remove('hidden');
             document.getElementById('resetConfirmCheck').checked = false;
+            document.getElementById('resetDataTypeSelect').value = 'ALL';
+            document.getElementById('resetBranchSelect').value = 'ALL';
         }
 
         function closeResetModal() {
@@ -1239,15 +1260,20 @@
             }
 
             const branch = document.getElementById('resetBranchSelect').value;
+            const dataType = document.getElementById('resetDataTypeSelect').value;
             const btn = document.getElementById('resetExecuteBtn');
             const originalText = btn.innerHTML;
 
-            if (!confirm(`정말로 ${branch === 'ALL' ? '전체' : branch} 데이터를 초기화하시겠습니까? 이 작업은 절대 복구할 수 없습니다.`)) {
+            const typeLabels = { 'ALL': '전체', 'SALES': '판매실적', 'INVENTORY': '재고', 'ISSUANCE': '불출' };
+            const branchLabel = branch === 'ALL' ? '전체 지사' : branch;
+            const typeLabel = typeLabels[dataType] || dataType;
+
+            if (!confirm(`정말로 [${branchLabel}]의 [${typeLabel}] 데이터를 초기화하시겠습니까?\n\n⚠️ 이 작업은 절대 복구할 수 없습니다.`)) {
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="animate-spin material-symbols-outlined">sync</span> Processing Reset...`;
+            btn.innerHTML = `<span class="animate-spin material-symbols-outlined">sync</span> 초기화 처리 중...`;
 
             if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.withSuccessHandler(msg => {
@@ -1260,10 +1286,10 @@
                     showToast("오류: " + err.message, 'error');
                     btn.disabled = false;
                     btn.innerHTML = originalText;
-                }).initializeSystem(branch);
+                }).initializeSystem(branch, dataType);
             } else {
                 setTimeout(() => {
-                    showToast("로컬 미리보기: " + (branch === 'ALL' ? '전체' : branch) + " 데이터 초기화 시뮬레이션 완료", 'success');
+                    showToast(`로컬 미리보기: [${branchLabel}]의 [${typeLabel}] 데이터 초기화 시뮬레이션 완료`, 'success');
                     closeResetModal();
                     btn.disabled = false;
                     btn.innerHTML = originalText;
