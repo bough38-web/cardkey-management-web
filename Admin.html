@@ -1032,13 +1032,13 @@
             const baseOrigin = origin ? origin.replace(/\/$/, '') : "";
 
             // Build absolute URLs for target="_top" navigation
-            // For Streamlit, Dashboard is at root (/), Sales is at /Sales_Registration
-            const dashUrl = baseOrigin ? baseOrigin + "/?page=Admin" : "?page=Admin";
-            const idxUrl = baseOrigin ? baseOrigin + "/Sales_Registration?page=Index" : "?page=Index";
-            const logoutUrl = baseOrigin ? baseOrigin + "/?logout=true" : "?logout=true";
+            // Use root-relative paths as fallback to ensure correct routing in Streamlit
+            const dashUrl = baseOrigin ? baseOrigin + "/?page=Admin" : "/?page=Admin";
+            const idxUrl = baseOrigin ? baseOrigin + "/Sales_Registration?page=Index" : "/Sales_Registration?page=Index";
+            const logoutUrl = baseOrigin ? baseOrigin + "/?logout=true" : "/?logout=true";
 
             const destDash = dashUrl + (baseOrigin ? params.replace('&', '&') : params);
-            const destIdx = idxUrl + (baseOrigin ? params.replace('&', '&') : params);
+            const destIdx = idxUrl + (idxUrl.includes('?') ? (baseOrigin ? params.replace('&', '&') : params) : '?' + (baseOrigin ? params.substring(1) : params.substring(1)));
             const destLogout = logoutUrl;
 
             const navDash = document.getElementById('navDashboard');

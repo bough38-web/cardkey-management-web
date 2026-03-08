@@ -701,14 +701,22 @@
 
       // Clean origin to avoid trailing slash issues
       const baseOrigin = origin ? origin.replace(/\/$/, '') : "";
-      const dashUrl = baseOrigin ? baseOrigin + "/?page=Admin" + params : "?page=Admin" + params;
-      const logoutUrl = baseOrigin ? baseOrigin + "/?logout=true" : "?logout=true";
+
+      // Use root-relative paths as fallback to ensure correct routing in Streamlit/GAS
+      const dashUrl = baseOrigin ? baseOrigin + "/?page=Admin" + params : "/?page=Admin" + params;
+      const logoutUrl = baseOrigin ? baseOrigin + "/?logout=true" : "/?logout=true";
 
       const navDash = document.getElementById('navDashboard');
       const navLogout = document.getElementById('navLogout');
 
-      if (navDash) navDash.href = dashUrl;
-      if (navLogout) navLogout.href = logoutUrl;
+      if (navDash) {
+        navDash.href = dashUrl;
+        console.log('Navigation - Dashboard URL set to:', dashUrl);
+      }
+      if (navLogout) {
+        navLogout.href = logoutUrl;
+        console.log('Navigation - Logout URL set to:', logoutUrl);
+      }
 
       if (userBranch && userBranch !== 'HQ') {
         document.getElementById('branch').value = userBranch;
