@@ -1011,6 +1011,11 @@
             currentBranch = urlParams.get('branch') || '';
             updateNavLinks(currentRole, currentBranch);
             loadData();
+
+            // Python 백엔드에서 액션 결과가 있으면 표시
+            if (window.__ACTION_RESULT__) {
+                showToast(window.__ACTION_RESULT__, 'success');
+            }
         };
 
         /**
@@ -1034,33 +1039,24 @@
                     rawTrends.qty = res.dailyQtyTrends || {};
                     renderDashboard(res);
                 }).getDashboardData(currentRole, fBranch.value, document.getElementById('filterYear').value, document.getElementById('filterMonth').value, document.getElementById('filterDay').value);
+            } else if (window.__INJECTED_DATA__) {
+                // Python 백엔드에서 주입된 실제 데이터 사용
+                const data = window.__INJECTED_DATA__;
+                rawTrends.revenue = data.dailyTrends || {};
+                rawTrends.qty = data.dailyQtyTrends || {};
+                renderDashboard(data);
             } else {
                 // Local Preview Simulation
                 const mock = {
-                    totalSales: 540,
-                    totalRevenue: 1620000,
-                    branchPerformance: { "중앙": 180, "강북": 150, "서대문": 120, "고양": 90 },
-                    dailyTrends: { "03/01": 300000, "03/02": 240000, "03/03": 450000, "03/04": 330000, "03/05": 300000 },
-                    dailyQtyTrends: { "03/01": 100, "03/02": 80, "03/03": 150, "03/04": 110, "03/05": 100 },
-                    keyTypeDistribution: { "카드키(125)": 240, "카드키(135)": 180, "고리키(125)": 120 },
-                    branchStockMetrics: {
-                        "중앙": { stock: 500, sales: 180, residual: 320 },
-                        "강북": { stock: 450, sales: 150, residual: 300 },
-                        "서대문": { stock: 400, sales: 120, residual: 280 },
-                        "고양": { stock: 350, sales: 90, residual: 260 },
-                        "의정부": { stock: 300, sales: 70, residual: 230 },
-                        "남양주": { stock: 280, sales: 60, residual: 220 },
-                        "강릉": { stock: 250, sales: 50, residual: 200 },
-                        "원주": { stock: 200, sales: 40, residual: 160 }
-                    },
-                    inventory: {
-                        "중앙": { "카드키(125MHz)": 200, "고리키(135MHz)": 120 },
-                        "강북": { "카드키(125MHz)": 300 }
-                    },
-                    workerStock: {
-                        "중앙_김현장": { "카드키(125MHz)": 20 },
-                        "강북_이팀장": { "고리키(135MHz)": 15 }
-                    },
+                    totalSales: 0,
+                    totalRevenue: 0,
+                    branchPerformance: {},
+                    dailyTrends: {},
+                    dailyQtyTrends: {},
+                    keyTypeDistribution: {},
+                    branchStockMetrics: {},
+                    inventory: {},
+                    workerStock: {},
                 };
                 rawTrends.revenue = mock.dailyTrends;
                 rawTrends.qty = mock.dailyQtyTrends;
@@ -1275,26 +1271,29 @@
             btn.disabled = true;
             btn.innerHTML = `<span class="animate-spin material-symbols-outlined">sync</span> 초기화 처리 중...`;
 
-            if (typeof google !== 'undefined' && google.script && google.script.run) {
-                google.script.run.withSuccessHandler(msg => {
-                    showToast(msg, 'success');
-                    closeResetModal();
-                    loadData();
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }).withFailureHandler(err => {
-                    showToast("오류: " + err.message, 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }).initializeSystem(branch, dataType);
-            } else {
-                setTimeout(() => {
-                    showToast(`로컬 미리보기: [${branchLabel}]의 [${typeLabel}] 데이터 초기화 시뮬레이션 완료`, 'success');
-                    closeResetModal();
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }, 1500);
+            // Python 백엔드로 리다이렉트 (우선)
+            if (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run)) {
+                const topUrl = window.top.location.href.split('?')[0];
+                const params = new URLSearchParams();
+                params.set('action', 'reset');
+                params.set('branch', branch);
+                params.set('dataType', dataType);
+                window.top.location.href = topUrl + '?' + params.toString();
+                return;
             }
+
+            // Google Apps Script 환경 (fallback)
+            google.script.run.withSuccessHandler(msg => {
+                showToast(msg, 'success');
+                closeResetModal();
+                loadData();
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }).withFailureHandler(err => {
+                showToast("오류: " + err.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }).initializeSystem(branch, dataType);
         }
 
         function exportDashboardToHTML() {
