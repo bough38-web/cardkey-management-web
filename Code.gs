@@ -476,37 +476,51 @@ function updateAdminInfo(data) {
 }
 
 /**
- * 시스템 초기화 (모든 데이터 삭제 - 주의!!)
- * 판매내역, 재고내역, 불출내역을 모두 비우고 헤더만 남깁니다.
- * 사원정보와 관리자정보는 기본값으로 복구합니다.
+ * 시스템 초기화 (데이터 삭제)
+ * @param {string} branchFilter - 특정 지사만 리셋할 경우 지사명, 전체 리셋은 빈값 또는 'ALL'
+ * 판매내역, 재고내역, 불출내역을 필터링하여 삭제합니다.
  */
-function initializeSystem() {
+function initializeSystem(branchFilter) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetsToClear = ['판매내역', '재고내역', '불출내역', '업로드용_결과'];
+  const sheetsToClear = ['판매내역', '재고내역', '불출내역'];
+  const isGlobalReset = !branchFilter || branchFilter === 'ALL' || branchFilter === 'HQ';
   
   sheetsToClear.forEach(name => {
     const sheet = ss.getSheetByName(name);
-    if (sheet) {
+    if (!sheet) return;
+    
+    if (isGlobalReset) {
       if (sheet.getLastRow() > 1) {
         sheet.deleteRows(2, sheet.getLastRow() - 1);
+      }
+    } else {
+      // 특정 지사만 삭제
+      const data = sheet.getDataRange().getValues();
+      // 역순으로 돌아야 삭제 시 인덱스가 꼬이지 않음
+      for (let i = data.length - 1; i >= 1; i--) {
+        if (data[i][1] === branchFilter) { // B열이 지사명임 (판매, 재고, 불출 공통)
+          sheet.deleteRow(i + 1);
+        }
       }
     }
   });
 
-  // 사원정보 초기화 (예시 데이터만 남기거나 비우기)
-  const workerSheet = ss.getSheetByName('사원정보');
-  if (workerSheet && workerSheet.getLastRow() > 1) {
-    workerSheet.deleteRows(2, workerSheet.getLastRow() - 1);
-    workerSheet.appendRow(['중앙', '홍길동']); // 기본 예시
-  }
+  if (isGlobalReset) {
+    // 사원정보 및 관리자 정보는 전체 리셋시에만 기본값 복구
+    const workerSheet = ss.getSheetByName('사원정보');
+    if (workerSheet && workerSheet.getLastRow() > 1) {
+      workerSheet.deleteRows(2, workerSheet.getLastRow() - 1);
+      workerSheet.appendRow(['중앙', '홍길동']);
+    }
 
-  // 관리자정보 초기화 (기본 admin 계정만 남기기)
-  const adminSheet = ss.getSheetByName('관리자정보');
-  if (adminSheet) {
-    adminSheet.clear();
-    adminSheet.appendRow(['사용자ID', '성명', '비밀번호', '권한', '지사']);
-    adminSheet.appendRow(['admin', '최고관리자', 'admin1234', 'Admin', 'HQ']);
+    const adminSheet = ss.getSheetByName('관리자정보');
+    if (adminSheet) {
+      adminSheet.clear();
+      adminSheet.appendRow(['사용자ID', '성명', '비밀번호', '권한', '지사']);
+      adminSheet.appendRow(['admin', '최고관리자', 'admin1234', 'Admin', 'HQ']);
+    }
+    return "시스템의 모든 데이터가 초기화되었습니다.";
+  } else {
+    return branchFilter + " 지사의 데이터가 초기화되었습니다.";
   }
-
-  return "시스템의 모든 데이터가 초기화되었습니다.";
 }

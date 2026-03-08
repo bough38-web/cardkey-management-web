@@ -406,6 +406,15 @@
                                 <span
                                     class="material-symbols-outlined text-[10px] opacity-0 group-hover/btn:opacity-100 transition-opacity">chevron_right</span>
                             </button>
+                            <button onclick="openResetModal()"
+                                class="w-full flex items-center justify-between px-5 py-3 text-xs font-bold text-rose-600 hover:bg-rose-600/5 transition-all outline-none border-t border-theme-border/50 text-left group/btn">
+                                <span class="flex items-center gap-3 text-rose-600">
+                                    <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                                    데이터 초기화 (Reset)
+                                </span>
+                                <span
+                                    class="material-symbols-outlined text-[10px] opacity-0 group-hover/btn:opacity-100 transition-opacity">chevron_right</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -865,6 +874,68 @@
             </div>
         </div>
     </div>
+
+    <!-- Reset Modal -->
+    <div id="resetModal"
+        class="fixed inset-0 z-[130] hidden flex items-start justify-center bg-black/80 backdrop-blur-md p-4 pt-20"
+        onclick="closeResetModal()">
+        <div class="glass-panel w-full max-w-md p-10 rounded-[3rem] shadow-2xl animate-in zoom-in duration-300 relative z-10 border-rose-500/20"
+            onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-xl font-black text-rose-500 tracking-tight uppercase flex items-center gap-3">
+                    <span class="material-symbols-outlined text-3xl">warning</span>
+                    System Reset
+                </h3>
+                <button onclick="closeResetModal()" class="text-theme-muted hover:text-white transition-colors">
+                    <span class="material-symbols-outlined text-3xl">close</span>
+                </button>
+            </div>
+            <div class="space-y-6">
+                <p class="text-[11px] font-bold text-theme-muted leading-relaxed">
+                    시스템의 데이터를 초기화합니다. 특정 지사만 선택하거나 전체 데이터를 삭제할 수 있습니다. <br>
+                    <span class="text-rose-500 italic">* 이 작업은 되돌릴 수 없으니 신중히 결정해주세요.</span>
+                </p>
+
+                <div>
+                    <label class="block text-[10px] font-black text-theme uppercase tracking-widest mb-3">초기화 대상 (지사
+                        선택)</label>
+                    <div class="relative">
+                        <select id="resetBranchSelect"
+                            class="w-full bg-theme-input border border-theme-border rounded-2xl px-5 py-4 text-theme-text outline-none focus:border-rose-500/50 transition-all font-bold appearance-none">
+                            <option value="ALL">전체 데이터 초기화 (All)</option>
+                            <option value="중앙">중앙</option>
+                            <option value="강북">강북</option>
+                            <option value="서대문">서대문</option>
+                            <option value="고양">고양</option>
+                            <option value="의정부">의정부</option>
+                            <option value="남양주">남양주</option>
+                            <option value="강릉">강릉</option>
+                            <option value="원주">원주</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-theme-muted pointer-events-none">expand_more</span>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/20">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" id="resetConfirmCheck"
+                            class="w-5 h-5 accent-rose-500 rounded border-none">
+                        <span
+                            class="text-[11px] font-bold text-rose-500/80 group-hover:text-rose-500 transition-colors">데이터
+                            영구 삭제에 동의하며 실행하겠습니다.</span>
+                    </label>
+                </div>
+
+                <div class="pt-4">
+                    <button onclick="handleSystemReset()" id="resetExecuteBtn"
+                        class="w-full bg-rose-600 text-white font-black text-xs uppercase tracking-[0.2em] py-5 rounded-2xl shadow-xl shadow-rose-900/20 hover:bg-rose-500 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                        Execute Destructive Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     </main>
     </div>
 
@@ -1148,6 +1219,58 @@
         /**
          * 1.6 HTML 대시보드 내보내기
          */
+        /**
+         * System Reset Functions
+         */
+        function openResetModal() {
+            document.getElementById('resetModal').classList.remove('hidden');
+            document.getElementById('resetConfirmCheck').checked = false;
+        }
+
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        function handleSystemReset() {
+            const confirmed = document.getElementById('resetConfirmCheck').checked;
+            if (!confirmed) {
+                showToast("삭제 동의 체크박스를 확인해주세요.", 'error');
+                return;
+            }
+
+            const branch = document.getElementById('resetBranchSelect').value;
+            const btn = document.getElementById('resetExecuteBtn');
+            const originalText = btn.innerHTML;
+
+            if (!confirm(`정말로 ${branch === 'ALL' ? '전체' : branch} 데이터를 초기화하시겠습니까? 이 작업은 절대 복구할 수 없습니다.`)) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin material-symbols-outlined">sync</span> Processing Reset...`;
+
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run.withSuccessHandler(msg => {
+                    showToast(msg, 'success');
+                    closeResetModal();
+                    loadData();
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }).withFailureHandler(err => {
+                    showToast("오류: " + err.message, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }).initializeSystem(branch);
+            } else {
+                setTimeout(() => {
+                    showToast("로컬 미리보기: " + (branch === 'ALL' ? '전체' : branch) + " 데이터 초기화 시뮬레이션 완료", 'success');
+                    closeResetModal();
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }, 1500);
+            }
+        }
+
         function exportDashboardToHTML() {
             const htmlContent = document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: 'text/html' });
