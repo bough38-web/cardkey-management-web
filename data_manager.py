@@ -2,6 +2,8 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+import pandas as pd
+import io
 
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
@@ -246,6 +248,53 @@ def reset_data(branch_filter='ALL', data_type='ALL'):
     branch_label = '전체 지사' if is_global_branch else f'{branch_filter} 지사'
 
     return f"✅ {branch_label}의 {type_label} 데이터가 초기화되었습니다. ({deleted_count}건 삭제)"
+
+# ─── 엑셀 내보내기 ──────────────────────────────────────────
+
+def generate_excel_export():
+    """판매, 재고, 불출 데이터를 엑셀 파일로 생성"""
+    sales = _load_json('sales.json')
+    inventory = _load_json('inventory.json')
+    issuance = _load_json('issuance.json')
+
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        if sales:
+            pd.DataFrame(sales).to_excel(writer, sheet_name='판매실적', index=False)
+        if inventory:
+            pd.DataFrame(inventory).to_excel(writer, sheet_name='본사입고', index=False)
+        if issuance:
+            pd.DataFrame(issuance).to_excel(writer, sheet_name='지사불출', index=False)
+    
+    output.seek(0)
+    return output
+
+# ─── 슈퍼 관리자 (관리자 관리) ──────────────────────────────────
+
+def get_all_admins():
+    return _load_json('admins.json')
+
+def save_admin(admin_data):
+    admins = _load_json('admins.json')
+    # 중복 체크
+    for i, a in enumerate(admins):
+        if a['userId'] == admin_data['userId']:
+            admins[i] = admin_data
+            _save_json('admins.json', admins)
+            return "✅ 관리자 정보가 수정되었습니다."
+    
+    admins.append(admin_data)
+    _save_json('admins.json', admins)
+    return "✅ 새 관리자가 등록되었습니다."
+
+def reset_admin_password(user_id, new_password):
+    admins = _load_json('admins.json')
+    for a in admins:
+        if a['userId'] == user_id:
+            a['password'] = new_password
+            _save_json('admins.json', admins)
+            return f"✅ {user_id}의 비밀번호가 초기화되었습니다."
+    return "❌ 해당 사용자를 찾을 수 없습니다."
 
 # ─── 초기 데이터 생성 (최초 실행 시) ────────────────────────────
 

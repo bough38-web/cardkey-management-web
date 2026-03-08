@@ -2,7 +2,7 @@ import streamlit as st
 import json
 import urllib.parse
 from datetime import datetime
-from data_manager import save_sale, get_workers_by_branch, get_all_workers, ensure_initial_data
+from data_manager import save_sale, save_inventory, get_workers_by_branch, get_all_workers, ensure_initial_data
 
 st.set_page_config(layout="wide", page_title="카드키 판매 등록", initial_sidebar_state="collapsed")
 
@@ -33,6 +33,20 @@ if action == "save":
         action_result = save_sale(sale_data)
     except Exception as e:
         action_result = f"❌ 저장 중 오류: {str(e)}"
+    st.query_params.clear()
+
+if action == "inventory_save":
+    try:
+        inv_data = {
+            'branch': params.get('branch', ''),
+            'type': params.get('type', ''),
+            'qty': params.get('qty', '0'),
+            'memo': params.get('memo', ''),
+            'worker': params.get('worker', '')
+        }
+        action_result = save_inventory(inv_data)
+    except Exception as e:
+        action_result = f"❌ 재고 등록 중 오류: {str(e)}"
     st.query_params.clear()
 
 # ─── 사원 데이터 준비 ─────────────────────────────────────────────

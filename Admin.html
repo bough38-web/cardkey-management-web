@@ -1009,8 +1009,15 @@
             const urlParams = new URLSearchParams(window.location.search);
             currentRole = urlParams.get('role') || 'Admin';
             currentBranch = urlParams.get('branch') || '';
+
+            // 필터 초기화
+            if (urlParams.has('year')) document.getElementById('filterYear').value = urlParams.get('year');
+            if (urlParams.has('month')) document.getElementById('filterMonth').value = urlParams.get('month');
+            if (urlParams.has('day')) document.getElementById('filterDay').value = urlParams.get('day');
+            if (urlParams.has('branch')) document.getElementById('filterBranch').value = urlParams.get('branch');
+
             updateNavLinks(currentRole, currentBranch);
-            loadData();
+            loadData(true); // Initial load
 
             // Python 백엔드에서 액션 결과가 있으면 표시
             if (window.__ACTION_RESULT__) {
@@ -1021,16 +1028,29 @@
         /**
          * 1. 데이터 로드 및 시각화 초기화
          */
-        function loadData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            currentRole = urlParams.get('role') || 'Admin';
-            currentBranch = urlParams.get('branch') || '';
+        function loadData(isInitial) {
+            const fBranch = document.getElementById('filterBranch');
+            const fYear = document.getElementById('filterYear').value;
+            const fMonth = document.getElementById('filterMonth').value;
+            const fDay = document.getElementById('filterDay').value;
 
             // 1) 지사 필터 노출 제어 (지사 사용자는 본인지사 고정)
-            const fBranch = document.getElementById('filterBranch');
             if (currentRole === 'Branch') {
                 fBranch.value = currentBranch;
                 fBranch.disabled = true;
+            }
+
+            // 2) Python 백엔드 리다이렉트 (필터 변경 시)
+            if (!isInitial && (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run))) {
+                const topUrl = window.top.location.href.split('?')[0];
+                const params = new URLSearchParams();
+                params.set('role', currentRole);
+                params.set('branch', fBranch.value || currentBranch);
+                params.set('year', fYear);
+                params.set('month', fMonth);
+                params.set('day', fDay);
+                window.top.location.href = topUrl + '?' + params.toString();
+                return;
             }
 
             if (typeof google !== 'undefined' && google.script && google.script.run) {
@@ -1038,7 +1058,7 @@
                     rawTrends.revenue = res.dailyTrends || {};
                     rawTrends.qty = res.dailyQtyTrends || {};
                     renderDashboard(res);
-                }).getDashboardData(currentRole, fBranch.value, document.getElementById('filterYear').value, document.getElementById('filterMonth').value, document.getElementById('filterDay').value);
+                }).getDashboardData(currentRole, fBranch.value, fYear, fMonth, fDay);
             } else if (window.__INJECTED_DATA__) {
                 // Python 백엔드에서 주입된 실제 데이터 사용
                 const data = window.__INJECTED_DATA__;
@@ -1046,7 +1066,7 @@
                 rawTrends.qty = data.dailyQtyTrends || {};
                 renderDashboard(data);
             } else {
-                // Local Preview Simulation
+                // Mock
                 const mock = {
                     totalSales: 0,
                     totalRevenue: 0,
@@ -1533,7 +1553,19 @@
                 const workerSelect = document.getElementById('invWorker');
                 if (!branch) return;
 
-                if (typeof google !== 'undefined') {
+                // Python 백엔드에서 주입된 사원 데이터 사용 (우선)
+                if (window.__WORKERS_MAP__) {
+                    const workers = window.__WORKERS_MAP__[branch] || [];
+                    workerSelect.innerHTML = '<option value="">사원 선택</option>';
+                    workers.forEach(w => {
+                        let opt = document.createElement('option');
+                        opt.value = w; opt.text = w;
+                        workerSelect.appendChild(opt);
+                    });
+                    return;
+                }
+
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
                     google.script.run.withSuccessHandler(workers => {
                         workerSelect.innerHTML = '<option value="">사원 선택</option>';
                         workers.forEach(w => {
@@ -1543,26 +1575,7 @@
                         });
                     }).getWorkersByBranch(branch);
                 } else {
-                    // Local mock
-                    setTimeout(() => {
-                        const mockData = {
-                            '중앙': ['김중앙', '이중앙', '박중앙', '최중앙', '정중앙'],
-                            '강북': ['김강북', '이강북', '박강북', '최강북', '정강북'],
-                            '서대문': ['김서대문', '이서대문', '박서대문', '최서대문', '정서대문'],
-                            '고양': ['김고양', '이고양', '박고양', '최고양', '정고양'],
-                            '의정부': ['김의정부', '이의정부', '박의정부', '최의정부', '정의정부'],
-                            '남양주': ['김남양주', '이남양주', '박남양주', '최남양주', '정남양주'],
-                            '강릉': ['김강릉', '이강릉', '박강릉', '최강릉', '정강릉'],
-                            '원주': ['김원주', '이원주', '박원주', '최원주', '정원주']
-                        };
-                        const mocks = mockData[branch] || ['사원A(현장)', '사원B(현장)', '담당자C'];
-                        workerSelect.innerHTML = '<option value="">사원 선택</option>';
-                        mocks.forEach(m => {
-                            let opt = document.createElement('option');
-                            opt.value = m; opt.text = m;
-                            workerSelect.appendChild(opt);
-                        });
-                    }, 300);
+                    workerSelect.innerHTML = '<option value="">사원 선택</option>';
                 }
             }
         };
@@ -1583,9 +1596,25 @@
                 memo: document.getElementById('invMemo').value
             };
 
-            const method = currentModalMode === 'Branch' ? 'processInventory' : 'processIssuance';
+            const action = currentModalMode === 'Branch' ? 'inventory_save' : 'issuance_save';
 
-            if (typeof google !== 'undefined') {
+            // Python 백엔드로 리다이렉트 (Streamlit 환경)
+            if (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run)) {
+                const topUrl = window.top.location.href.split('?')[0];
+                const params = new URLSearchParams();
+                params.set('action', action);
+                params.set('branch', payload.branch);
+                if (payload.worker) params.set('worker', payload.worker);
+                params.set('type1', payload.type1);
+                params.set('type2', payload.type2);
+                params.set('qty', payload.qty);
+                params.set('memo', payload.memo);
+                window.top.location.href = topUrl + '?' + params.toString();
+                return;
+            }
+
+            const method = currentModalMode === 'Branch' ? 'processInventory' : 'processIssuance';
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.withSuccessHandler(msg => {
                     alert(msg);
                     btn.disabled = false;
@@ -1598,7 +1627,14 @@
         };
 
         function downloadExcel() {
-            if (typeof google !== 'undefined') {
+            // Python 백엔드 (Streamlit)
+            if (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run)) {
+                const topUrl = window.top.location.href.split('?')[0];
+                window.top.location.href = topUrl + '?action=download_excel';
+                return;
+            }
+
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.withSuccessHandler(msg => alert(msg)).generateExportFile();
             } else {
                 alert("엑셀 다운로드가 요청되었습니다. (로컬 미리보기)");
@@ -1645,9 +1681,23 @@
         }
 
         function fetchAdminUsers() {
-            if (typeof google !== 'undefined') {
+            const sel = document.getElementById('saTargetUser');
+
+            // Python 백엔드 (주입된 데이터 사용)
+            if (window.__ADMINS_LIST__) {
+                const users = window.__ADMINS_LIST__;
+                sel.innerHTML = '<option value="">대상 선택</option>';
+                users.forEach(u => {
+                    let opt = document.createElement('option');
+                    opt.value = u.userId;
+                    opt.text = `${u.name} (${u.branch}/${u.role})`;
+                    sel.appendChild(opt);
+                });
+                return;
+            }
+
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
                 google.script.run.withSuccessHandler(users => {
-                    const sel = document.getElementById('saTargetUser');
                     sel.innerHTML = '<option value="">대상 선택</option>';
                     users.forEach(u => {
                         const opt = document.createElement('option');
@@ -1657,10 +1707,7 @@
                     });
                 }).getAdminUsers();
             } else {
-                document.getElementById('saTargetUser').innerHTML = `
-                    <option value="">대상 선택</option>
-                    <option value="admin">최고관리자 (Local)</option>
-                `;
+                sel.innerHTML = '<option value="">대상 선택</option><option value="admin">최고관리자 (Local)</option>';
             }
         }
 
@@ -1695,37 +1742,51 @@
                 btn.disabled = false;
             };
 
-            if (typeof google === 'undefined') {
+            // Python 백엔드 (Streamlit 리다이렉트)
+            if (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run)) {
+                const topUrl = window.top.location.href.split('?')[0];
+                const q = new URLSearchParams();
+                q.set('action', 'sa_action');
+                q.set('sub', action);
+                q.set('userId', targetId || 'admin_' + Date.now());
+                q.set('name', name);
+                q.set('password', password);
+                q.set('branch_name', branch);
+                q.set('role_type', 'Admin');
+                window.top.location.href = topUrl + '?' + q.toString();
+                return;
+            }
+
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                if (action === 'reset') {
+                    if (!targetId || !password) {
+                        showToast("대상과 새 비밀번호를 입력해주세요.", "warning");
+                        btn.innerHTML = origText; btn.disabled = false; return;
+                    }
+                    google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
+                        .resetAdminPassword(targetId, password);
+                } else if (action === 'register') {
+                    if (!name || !password) {
+                        showToast("이름과 비밀번호는 필수입니다.", "warning");
+                        btn.innerHTML = origText; btn.disabled = false; return;
+                    }
+                    google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
+                        .registerAdmin({ name, branch, password, userId: 'admin_' + Date.now() });
+                } else if (action === 'edit') {
+                    if (!targetId) {
+                        showToast("대상을 선택해주세요.", "warning");
+                        btn.innerHTML = origText; btn.disabled = false; return;
+                    }
+                    google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
+                        .updateAdminInfo({ userId: targetId, name, branch });
+                }
+            } else {
                 setTimeout(() => {
                     showToast(`[로컬 시뮬레이션] ${action} 요청이 처리되었습니다.`, 'info');
                     closeSuperAdminModal();
                     btn.innerHTML = origText;
                     btn.disabled = false;
                 }, 800);
-                return;
-            }
-
-            if (action === 'reset') {
-                if (!targetId || !password) {
-                    showToast("대상과 새 비밀번호를 입력해주세요.", "warning");
-                    btn.innerHTML = origText; btn.disabled = false; return;
-                }
-                google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
-                    .resetAdminPassword(targetId, password);
-            } else if (action === 'register') {
-                if (!name || !password) {
-                    showToast("이름과 비밀번호는 필수입니다.", "warning");
-                    btn.innerHTML = origText; btn.disabled = false; return;
-                }
-                google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
-                    .registerAdmin({ name, branch, password, userId: 'admin_' + Date.now() });
-            } else if (action === 'edit') {
-                if (!targetId) {
-                    showToast("대상을 선택해주세요.", "warning");
-                    btn.innerHTML = origText; btn.disabled = false; return;
-                }
-                google.script.run.withSuccessHandler(successHandler).withFailureHandler(failureHandler)
-                    .updateAdminInfo({ userId: targetId, name, branch });
             }
         };
 

@@ -935,6 +935,20 @@
         worker: document.getElementById('userName').innerText // Current user
       };
 
+      // Python 백엔드로 리다이렉트 (Streamlit 환경)
+      if (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run)) {
+        const topUrl = window.top.location.href.split('?')[0];
+        const params = new URLSearchParams();
+        params.set('action', 'inventory_save');
+        params.set('branch', payload.branch);
+        params.set('type', payload.type);
+        params.set('qty', payload.qty);
+        params.set('memo', payload.memo);
+        params.set('worker', payload.worker);
+        window.top.location.href = topUrl + '?' + params.toString();
+        return;
+      }
+
       if (typeof google !== 'undefined' && google.script && google.script.run) {
         google.script.run.withSuccessHandler(msg => {
           alert(msg);
@@ -943,13 +957,6 @@
           document.getElementById('invForm').reset();
           closeInventoryModal();
         }).processInventory(payload);
-      } else {
-        setTimeout(() => {
-          alert("재고 등록 시뮬레이션 완료 (로컬)");
-          btn.disabled = false;
-          btn.innerHTML = originalText;
-          closeInventoryModal();
-        }, 1000);
       }
     };
   </script>
