@@ -1004,6 +1004,21 @@
             });
         }
 
+        /**
+         * 0. 공통 유틸리티: 최상위 페이지 리다이렉트 (Streamlit Cloud 대응)
+         */
+        function redirectToTop(url) {
+            try {
+                window.top.location.href = url;
+            } catch (e) {
+                console.log("window.top access blocked, using fallback redirect");
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_top';
+                a.click();
+            }
+        }
+
         window.onload = function () {
             setTheme(localStorage.getItem('selectedTheme') || 'dark');
             const urlParams = new URLSearchParams(window.location.search);
@@ -1049,7 +1064,7 @@
                 params.set('year', fYear);
                 params.set('month', fMonth);
                 params.set('day', fDay);
-                window.top.location.href = topUrl + '?' + params.toString();
+                redirectToTop(topUrl + '?' + params.toString());
                 return;
             }
 
@@ -1609,7 +1624,7 @@
                 params.set('type2', payload.type2);
                 params.set('qty', payload.qty);
                 params.set('memo', payload.memo);
-                window.top.location.href = topUrl + '?' + params.toString();
+                redirectToTop(topUrl + '?' + params.toString());
                 return;
             }
 
@@ -1630,7 +1645,7 @@
             // Python 백엔드 (Streamlit)
             if (window.__USE_PYTHON_BACKEND__ || !(typeof google !== 'undefined' && google.script && google.script.run)) {
                 const topUrl = window.top.location.href.split('?')[0];
-                window.top.location.href = topUrl + '?action=download_excel';
+                redirectToTop(topUrl + '?action=download_excel');
                 return;
             }
 
@@ -1753,7 +1768,7 @@
                 q.set('password', password);
                 q.set('branch_name', branch);
                 q.set('role_type', 'Admin');
-                window.top.location.href = topUrl + '?' + q.toString();
+                redirectToTop(topUrl + '?' + q.toString());
                 return;
             }
 

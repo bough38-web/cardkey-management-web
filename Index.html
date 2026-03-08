@@ -662,6 +662,21 @@
       }, 3000);
     }
 
+    /**
+     * 공통 유틸리티: 최상위 페이지 리다이렉트 (Streamlit Cloud 대응)
+     */
+    function redirectToTop(url) {
+      try {
+        window.top.location.href = url;
+      } catch (e) {
+        console.log("window.top access blocked, using fallback redirect");
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_top';
+        a.click();
+      }
+    }
+
     // Initial setup
     function getAppOrigin() {
       try {
@@ -881,7 +896,7 @@
         params.set('totalPrice', String((parseInt(data.qty) || 0) * (currentSaleType === 'paid' ? 3000 : 0)));
         params.set('saleType', data.saleType);
         params.set('memo', data.memo || '');
-        window.top.location.href = topUrl + '?' + params.toString();
+        redirectToTop(topUrl + '?' + params.toString());
         return;
       }
 
@@ -942,10 +957,13 @@
         params.set('action', 'inventory_save');
         params.set('branch', payload.branch);
         params.set('type', payload.type);
-        params.set('qty', payload.qty);
+        params.set('qty', payload.qty); // Keep original qty
+        // Added unitPrice and totalPrice as per instruction's example, assuming default values for inventory
+        params.set('unitPrice', '0'); // Inventory items might not have a unit price in this context
+        params.set('totalPrice', '0'); // Inventory items might not have a total price in this context
         params.set('memo', payload.memo);
         params.set('worker', payload.worker);
-        window.top.location.href = topUrl + '?' + params.toString();
+        redirectToTop(topUrl + '?' + params.toString());
         return;
       }
 
